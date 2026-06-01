@@ -53,7 +53,48 @@ affiliated with OpenDataLab or MinerU. Users are responsible for complying with
 MinerU's own license and service terms. If online services are ever built using
 MinerU, documentation must state that the service uses MinerU.
 
-## Quick Start
+## Quick Start For Agent Users
+
+This project is designed to be agent-readable.
+
+If you are using Codex, Claude Code, OpenCode, Cursor, Devin, or another coding
+agent, give the agent this repository link and your filing input, then ask it
+to install the project, read this README, run the smoke test, and generate a
+report.
+
+Suggested prompt:
+
+```text
+Please use this project:
+https://github.com/YihongGuo/Filling-Crosswalker
+
+Clone or open the repository, read README.md and AGENTS.md, install it in a
+local virtual environment, run the built-in smoke test, then analyze my filing
+Markdown/TXT file with filing-crosswalk. Generate a Markdown report, a JSON
+structured report, and, if useful, a management memo. Do not treat the output as
+legal, investment, accounting, or audit advice.
+```
+
+For a first test, ask your agent to run the built-in synthetic example:
+
+```text
+Use the sample file examples/synthetic_legal_proceedings.md and generate:
+- outputs/report.md
+- outputs/report.json
+Then summarize the top flagged paragraphs and escalation questions for me.
+```
+
+Expected result:
+
+- A Markdown review report at `outputs/report.md`
+- A structured JSON report at `outputs/report.json`
+- Reading decisions such as `SKIM`, `DEEP_READ`, or `ESCALATE`
+- Legal-to-finance notes and role-specific escalation questions
+- A disclaimer reminding you that the output is only a triage aid
+
+## Manual Developer Setup
+
+If you are running the project yourself from a terminal:
 
 ```bash
 python -m pip install -e ".[dev]"
@@ -62,7 +103,7 @@ filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
   --json outputs/report.json
 ```
 
-Run tests and evals:
+Run tests and evals if you are modifying the code:
 
 ```bash
 pytest
