@@ -7,7 +7,7 @@ from collections import defaultdict
 from sec_filing_legal_decoder.schemas import RiskCard, RiskCardReport
 
 
-TERM_STYLES = {"english", "bilingual", "translated"}
+TERM_STYLES = {"english", "bilingual"}
 
 DOMAIN_TERMS: dict[str, tuple[str, str]] = {
     "audit_going_concern": ("持续经营 / 重大疑虑", "Going Concern / Substantial Doubt"),
@@ -435,8 +435,6 @@ def _domain_title(card: RiskCard, term_style: str) -> str:
     zh, en = DOMAIN_TERMS.get(card.risk_domain, (card.title, card.title))
     if term_style == "english":
         return en
-    if term_style == "translated":
-        return zh
     return f"{zh}（{en}）"
 
 
@@ -500,7 +498,7 @@ def _frontmatter(report: RiskCardReport, title_prefix: str, note_type: str) -> l
         "  - sec-filing",
         "  - legal-risk",
         "  - zh-CN",
-        "  - sec-filing-legal-decoder/v0.3.0",
+        "  - sec-filing-legal-decoder/v0.3.1",
         f"note_type: {note_type}",
         f'form_type: "{_yaml_escape(report.document.form_type)}"',
         f'document_mode: "{_yaml_escape(report.document.mode)}"',

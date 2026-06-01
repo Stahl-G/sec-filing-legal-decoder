@@ -92,9 +92,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     risk_cards.add_argument(
         "--term-style",
-        choices=["english", "bilingual", "translated"],
+        choices=["english", "bilingual"],
         default="bilingual",
-        help="Term style for non-English reports.",
+        help="Advanced: domain title style for non-English reports. Default: bilingual.",
     )
     risk_cards.add_argument("--company", help="Company name for Obsidian frontmatter.")
     risk_cards.add_argument("--ticker", help="Ticker for Obsidian frontmatter.")

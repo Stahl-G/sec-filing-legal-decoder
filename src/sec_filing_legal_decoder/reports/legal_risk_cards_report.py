@@ -50,7 +50,7 @@ def _frontmatter(report: RiskCardReport) -> list[str]:
         "tags:",
         "  - sec-filing",
         "  - legal-risk",
-        "  - sec-filing-legal-decoder/v0.3.0",
+        "  - sec-filing-legal-decoder/v0.3.1",
         f'form_type: "{_yaml_escape(report.document.form_type)}"',
         f'document_mode: "{_yaml_escape(report.document.mode)}"',
         f'source_path: "{_yaml_escape(report.document.source_path)}"',

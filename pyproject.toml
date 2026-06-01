@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sec-filing-legal-decoder"
-version = "0.3.0"
+version = "0.3.1"
 description = "AI agent skill and CLI for turning legal-heavy SEC filing sections into finance-readable legal risk reviews, risk cards, and escalation questions."
 readme = "README.md"
 requires-python = ">=3.10"

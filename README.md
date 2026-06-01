@@ -25,7 +25,7 @@ and material contracts.
 
 ## What This Project Is
 
-- A deterministic v0.3.0 toolkit for legal-to-finance filing triage.
+- A deterministic v0.3.1 toolkit for legal-to-finance filing triage.
 - A risk-card generator that groups source paragraphs into issue-level legal,
   regulatory, governance, audit, disclosure, debt, related-party, dilution, tax,
   cybersecurity, and material-contract cards, then consolidates overlapping
@@ -42,7 +42,7 @@ and material contracts.
 
 ## 这个项目是什么
 
-- 一个 deterministic v0.3.0 工具，用于把 filing 里的法律语言转成 finance reader
+- 一个 deterministic v0.3.1 工具，用于把 filing 里的法律语言转成 finance reader
   能用的 triage 输出。
 - 一个 risk-card generator，可以把 source paragraphs 聚合成事项级 legal、
   regulatory、governance、audit、disclosure、debt、related-party、dilution、
@@ -126,7 +126,7 @@ matter for Legal, Finance, Auditors, IR, Management, or the Board.
 This project helps answer: should this paragraph be skipped, skimmed, read,
 deep-read, or escalated?
 
-In v0.3.0, the preferred output is no longer a long paragraph-by-paragraph
+In v0.3.1, the preferred output is no longer a long paragraph-by-paragraph
 report. The preferred output is a small set of issue-level legal risk cards.
 Each card explains what the filing language may mean, why a finance reader
 should care, which owners should review it, what questions to ask, what not to
@@ -145,7 +145,7 @@ remains available as the card appendix.
 
 这个项目帮助回答：这段话应该跳过、略读、正常读、深读，还是升级处理？
 
-在 v0.3.0 中，首选输出不再是很长的逐段报告，而是一组事项级 legal risk cards。
+在 v0.3.1 中，首选输出不再是很长的逐段报告，而是一组事项级 legal risk cards。
 每张卡会解释 filing 语言可能意味着什么、为什么金融读者需要关心、应该找哪些 owner
 review、该问什么问题、哪些结论不能过度表述、这和普通财务分析有什么不同，以及
 支撑这张卡的 source excerpts。
@@ -692,7 +692,7 @@ python evals/run_evals.py
 
 ## CLI Examples
 
-Generate v0.3.0 legal risk review and risk cards. This is the preferred command for agent
+Generate v0.3.1 legal risk review and risk cards. This is the preferred command for agent
 workflows:
 
 ```bash
@@ -723,18 +723,17 @@ with key filing/legal terms preserved:
 ```bash
 sec-filing-legal-decoder risk-cards tsla-20251231.htm \
   --output-dir outputs/tesla-10k-risk-cards-zh \
-  --lang zh-CN \
-  --term-style bilingual
+  --lang zh-CN
 ```
 
 Language options:
 
 - `--lang en` keeps the default English reports.
-- `--lang zh-CN --term-style bilingual` writes Chinese explanations with key
-  English terms such as `Legal Proceedings`, `valuation allowance`, and
-  `reasonably possible` preserved.
-- `--term-style english`, `--term-style bilingual`, and `--term-style translated`
-  control how domain titles are displayed in non-English reports.
+- `--lang zh-CN` writes Chinese explanations with key English terms such as
+  `Legal Proceedings`, `valuation allowance`, and `reasonably possible`
+  preserved. Source excerpts remain in the original filing language.
+- Advanced: `--term-style english` can force English-only domain titles in
+  Chinese reports. Most users should leave the default bilingual style unchanged.
 
 Compare an existing finance or earnings analysis against the filing risk cards:
 
@@ -789,7 +788,7 @@ sec-filing-legal-decoder memo examples/synthetic_internal_control.md --out outpu
 
 ## CLI 示例
 
-生成 v0.3.0 legal risk review 和 risk cards。Agent workflow 推荐优先使用这个命令：
+生成 v0.3.1 legal risk review 和 risk cards。Agent workflow 推荐优先使用这个命令：
 
 ```bash
 sec-filing-legal-decoder risk-cards tsla-20251231.htm \
@@ -818,17 +817,17 @@ management-follow-up.md
 ```bash
 sec-filing-legal-decoder risk-cards tsla-20251231.htm \
   --output-dir outputs/tesla-10k-risk-cards-zh \
-  --lang zh-CN \
-  --term-style bilingual
+  --lang zh-CN
 ```
 
 语言选项：
 
 - `--lang en` 保持默认英文报告。
-- `--lang zh-CN --term-style bilingual` 输出中文解释，并保留 `Legal Proceedings`、
-  `valuation allowance`、`reasonably possible` 等关键英文术语。
-- `--term-style english`、`--term-style bilingual`、`--term-style translated`
-  控制非英文报告里的 domain title 展示方式。
+- `--lang zh-CN` 输出中文解释，并保留 `Legal Proceedings`、
+  `valuation allowance`、`reasonably possible` 等关键英文术语。Source excerpts
+  保留 filing 原文语言。
+- Advanced: `--term-style english` 可以把中文报告里的 domain title 强制显示为英文。
+  大多数用户不需要改，默认 bilingual 最适合中文 SEC filing review。
 
 把已有 finance / earnings analysis 和 filing risk cards 做 overlay review：
 
@@ -1001,7 +1000,7 @@ sec-filing-legal-decoder memo samples/tesla/tsla-10ka.htm \
 
 ## Output Schema
 
-The v0.3.0 `risk-cards` JSON output contains:
+The v0.3.1 `risk-cards` JSON output contains:
 
 - `document`
 - `coverage_summary`
@@ -1059,7 +1058,7 @@ Each analyzed paragraph produces:
 
 ## 输出字段
 
-v0.3.0 `risk-cards` JSON 输出包含：
+v0.3.1 `risk-cards` JSON 输出包含：
 
 - `document`
 - `coverage_summary`
@@ -1178,10 +1177,10 @@ skills/
 - 使用 synthetic examples 或公开 filing excerpts。
 - 所有输出都只是 reading aid，需要专业 review。
 
-## Known Issues In v0.3.0
+## Known Issues In v0.3.1
 
 - Long annual reports can still route many paragraphs into the risk candidate
-  pool. v0.3.0 now consolidates common duplicate cards such as guarantee-vs-debt,
+  pool. v0.3.1 consolidates common duplicate cards such as guarantee-vs-debt,
   warrant-vs-guarantee, litigation-vs-disclosure, and weak governance overlaps,
   but future versions should add better section-aware clustering.
 - Some issuer-specific facts are extracted by deterministic sentence heuristics.
@@ -1198,9 +1197,9 @@ skills/
 - HTML extraction preserves visible text but does not yet reconstruct original
   EDGAR section hierarchy, tables, or page locations with full fidelity.
 
-## v0.3.0 已知问题
+## v0.3.1 已知问题
 
-- 很长的年报仍可能把较多段落 route 到 risk candidate pool。v0.3.0 已经会合并常见
+- 很长的年报仍可能把较多段落 route 到 risk candidate pool。v0.3.1 会合并常见
   重复卡片，例如 guarantee-vs-debt、warrant-vs-guarantee、litigation-vs-disclosure
   和弱 governance overlap，但后续版本仍需要更强的 section-aware clustering。
 - issuer-specific facts 目前由 deterministic sentence heuristics 抽取。它能改善
@@ -1216,6 +1215,12 @@ skills/
 
 ## Roadmap
 
+v0.3.1:
+
+- Simplified the Chinese report path: use `--lang zh-CN`; bilingual terminology is the default
+- Removed the misleading `translated` term style from the CLI and README examples
+- Kept `--term-style english` only as an advanced option for English-only domain titles inside Chinese reports
+
 v0.3.0:
 
 - Added sharper read-first card consolidation for NVIDIA-style annual reports
@@ -1224,7 +1229,7 @@ v0.3.0:
 - Suppressed disclosure/IR and weak governance cards when they duplicate legal proceedings, cybersecurity governance, or ordinary board/buyback language
 - Added `financial_analysis_difference` to every risk card so each card opens with how the legal-risk read differs from ordinary financial analysis
 - Sharpened tax review language around deferred tax assets, valuation allowance, more-likely-than-not support, jurisdictional taxable income, and one-time release risk
-- Added `--lang zh-CN` and `--term-style english|bilingual|translated` for Chinese bilingual Markdown output
+- Added `--lang zh-CN` and `--term-style english|bilingual` for Chinese bilingual Markdown output
 
 v0.2.1:
 
@@ -1279,6 +1284,12 @@ v0.4:
 
 ## 路线图
 
+v0.3.1:
+
+- 简化中文报告路径：使用 `--lang zh-CN` 即可，默认就是 bilingual terminology
+- 移除容易误导的 `translated` term style，不再暗示存在真正“纯中文报告”
+- 仅保留 `--term-style english` 作为高级选项，用于在中文报告中强制显示英文 domain title
+
 v0.3.0:
 
 - 针对 NVIDIA 这类长年报，新增更清晰的 read-first card consolidation
@@ -1287,7 +1298,7 @@ v0.3.0:
 - 当 disclosure/IR 或弱 governance card 只是重复 legal proceedings、cybersecurity governance 或普通 board/buyback language 时，压到主线之外
 - 每张 risk card 新增 `financial_analysis_difference`，开头说明这张卡和普通财务分析的差异
 - 强化 tax card，对 deferred tax assets、valuation allowance、more-likely-than-not support、jurisdictional taxable income 和 one-time release risk 做更明确的核查提示
-- 新增 `--lang zh-CN` 和 `--term-style english|bilingual|translated`，支持中文双语 Markdown 输出
+- 新增 `--lang zh-CN` 和 `--term-style english|bilingual`，支持中文双语 Markdown 输出
 
 v0.2.1:
 

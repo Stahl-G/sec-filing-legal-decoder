@@ -180,8 +180,6 @@ def test_cli_risk_cards_supports_zh_cn_bilingual_output(tmp_path: Path):
             str(output_dir),
             "--lang",
             "zh-CN",
-            "--term-style",
-            "bilingual",
         ]
     )
 
@@ -193,6 +191,32 @@ def test_cli_risk_cards_supports_zh_cn_bilingual_output(tmp_path: Path):
     assert "诉讼及法律程序（Legal Proceedings / Litigation）" in review
     assert "不宜过度表述" in cards
     assert "reasonably possible" in cards
+
+
+def test_cli_rejects_translated_term_style(tmp_path: Path):
+    input_path = tmp_path / "sample.htm"
+    input_path.write_text(
+        "<html><body><p>Form 10-K Annual Report</p>"
+        "<p>The company is involved in legal proceedings.</p>"
+        "</body></html>",
+        encoding="utf-8",
+    )
+
+    try:
+        main(
+            [
+                "risk-cards",
+                str(input_path),
+                "--lang",
+                "zh-CN",
+                "--term-style",
+                "translated",
+            ]
+        )
+    except SystemExit as exc:
+        assert exc.code == 2
+    else:
+        raise AssertionError("translated term style should be rejected")
 
 
 def test_cli_review_overlay_writes_overlay(tmp_path: Path):
