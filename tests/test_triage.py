@@ -1,4 +1,4 @@
-from filing_crosswalk.classifiers import triage_paragraph
+from sec_filing_legal_decoder.classifiers import triage_paragraph
 
 
 def test_generic_boilerplate_skips_or_skims():

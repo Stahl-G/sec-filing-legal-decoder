@@ -1,13 +1,19 @@
-# Filling-Crosswalker
+# SEC Filing Legal Decoder
 
-Filling-Crosswalker is an open-source, agent-readable Python CLI project for
-`filing-crosswalk`: a workflow layer for reading SEC filings, annual reports,
-and legal-heavy corporate documents, especially `20-F`, `10-K`, `10-Q`, and
-`40-F` reports.
+Legal-to-finance workflows for decoding legal-heavy `10-K`, `20-F`, and annual
+report sections.
 
-Filling-Crosswalker 是一个开源、适合 agent 自动读取和执行的 Python CLI 项目。
-它的命令名是 `filing-crosswalk`，定位是 SEC filing、年报和法律语言较重的公司
-文件的工作流层，尤其适合 `20-F`、`10-K`、`10-Q`、`40-F`。
+SEC Filing Legal Decoder is an AI agent skill and CLI for decoding legal-heavy
+SEC filing sections into finance-readable risk notes, triage decisions, and
+escalation questions. It is especially useful for `10-K`, `10-Q`, `20-F`,
+`40-F`, and annual report review workflows.
+
+法律语言到金融理解的工作流，用于解码 `10-K`、`20-F` 和年报中法律语言较重的
+章节。
+
+SEC Filing Legal Decoder 是一个 AI agent skill 和 CLI，用来把 SEC filing 中
+法律语言较重的章节解码为金融读者能理解的风险笔记、阅读分级和升级问题。它尤其
+适合 `10-K`、`10-Q`、`20-F`、`40-F` 和年报 review。
 
 It focuses on the non-financial filing language that can change financial
 judgment: legal proceedings, regulatory risk, internal control weaknesses,
@@ -24,7 +30,7 @@ and material contracts.
   TXT today.
 - An optional MinerU adapter for PDF/Office fallback when the source is not an
   EDGAR HTML main filing.
-- A generator for crosswalk notes, reading decisions, escalation questions,
+- A generator for legal-to-finance review notes, reading decisions, escalation questions,
   Markdown reports, JSON output, and management memo drafts.
 - A model-agnostic workflow layer that can later work with ChatGPT, Claude,
   Codex, OpenCode, local LLMs, or manual review.
@@ -37,7 +43,7 @@ and material contracts.
   TXT。
 - 一个可选 MinerU adapter，只在 PDF/Office 等非 EDGAR HTML 主文件场景下作为
   fallback。
-- 一个可以生成 crosswalk notes、reading decisions、escalation questions、
+- 一个可以生成 legal-to-finance review notes、reading decisions、escalation questions、
   Markdown report、JSON output 和 management memo draft 的工具。
 - 一个 model-agnostic workflow layer，未来可以接 ChatGPT、Claude、Codex、
   OpenCode、本地 LLM 或人工 review。
@@ -124,7 +130,7 @@ MinerU remains useful for PDF, DOCX, PPTX, XLSX, image, or non-EDGAR document
 parsing. It should not be the default path for standard SEC `10-K`, `10-Q`,
 `20-F`, or `40-F` main filings when `.htm/.html` is available.
 
-Filling-Crosswalker handles filing workflow intelligence after readable text
+SEC Filing Legal Decoder handles filing workflow intelligence after readable text
 exists: section classification, legal-to-finance decoding, boilerplate vs
 material triage, escalation question generation, and memo output.
 
@@ -140,7 +146,7 @@ MinerU 仍然适合 PDF、DOCX、PPTX、XLSX、图片或非 EDGAR 文档解析�
 SEC `10-K`、`10-Q`、`20-F`、`40-F` 主文件，并且已经有 `.htm/.html`，就不应该
 默认走 MinerU。
 
-Filling-Crosswalker 处理的是“文本已经可读之后”的 filing workflow intelligence：
+SEC Filing Legal Decoder 处理的是“文本已经可读之后”的 filing workflow intelligence：
 章节分类、legal-to-finance 解码、boilerplate vs material triage、升级问题生成和
 memo 输出。
 
@@ -159,11 +165,11 @@ Suggested prompt:
 
 ```text
 Please use this project:
-https://github.com/Stahl-G/Filling-Crosswalker
+https://github.com/Stahl-G/sec-filing-legal-decoder
 
 Clone or open the repository, read README.md and AGENTS.md, install it in a
 local virtual environment, run the built-in smoke test, then analyze my SEC
-filing main .htm/.html file with filing-crosswalk. This is especially intended
+filing main .htm/.html file with sec-filing-legal-decoder. This is especially intended
 for 20-F, 10-K, 10-Q, and 40-F legal-heavy sections. Generate a Markdown report,
 a JSON structured report, and, if useful, a management memo. Do not treat the
 output as legal, investment, accounting, or audit advice.
@@ -180,10 +186,10 @@ Codex、Claude Code、OpenCode、Cursor、Devin 或其他 coding agent，可以�
 
 ```text
 请使用这个项目：
-https://github.com/Stahl-G/Filling-Crosswalker
+https://github.com/Stahl-G/sec-filing-legal-decoder
 
 请 clone 或打开这个仓库，阅读 README.md 和 AGENTS.md，在本地虚拟环境中安装
-项目，先运行内置 smoke test，然后用 filing-crosswalk 分析我的 SEC filing 主
+项目，先运行内置 smoke test，然后用 sec-filing-legal-decoder 分析我的 SEC filing 主
 .htm/.html 文件。这个项目特别适合 20-F、10-K、10-Q、40-F 中法律语言较重的
 章节。请输出 Markdown review report、JSON structured report，并在有必要时生成
 management memo。不要把输出当作法律、投资、会计或审计意见。
@@ -194,7 +200,7 @@ management memo。不要把输出当作法律、投资、会计或审计意见�
 Run the built-in synthetic example:
 
 ```bash
-filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
+sec-filing-legal-decoder analyze examples/synthetic_legal_proceedings.md \
   --out outputs/report.md \
   --json outputs/report.json
 ```
@@ -202,7 +208,7 @@ filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
 Run the built-in synthetic SEC HTML / Inline XBRL-style example:
 
 ```bash
-filing-crosswalk analyze examples/synthetic_sec_inline_xbrl.htm \
+sec-filing-legal-decoder analyze examples/synthetic_sec_inline_xbrl.htm \
   --out outputs/html-report.md \
   --json outputs/html-report.json
 ```
@@ -220,7 +226,7 @@ Expected result:
 先跑内置 synthetic example：
 
 ```bash
-filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
+sec-filing-legal-decoder analyze examples/synthetic_legal_proceedings.md \
   --out outputs/report.md \
   --json outputs/report.json
 ```
@@ -228,7 +234,7 @@ filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
 再跑内置 synthetic SEC HTML / Inline XBRL-style example：
 
 ```bash
-filing-crosswalk analyze examples/synthetic_sec_inline_xbrl.htm \
+sec-filing-legal-decoder analyze examples/synthetic_sec_inline_xbrl.htm \
   --out outputs/html-report.md \
   --json outputs/html-report.json
 ```
@@ -249,7 +255,7 @@ If you are running the project yourself from a terminal:
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install .
-filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
+sec-filing-legal-decoder analyze examples/synthetic_legal_proceedings.md \
   --out outputs/report.md \
   --json outputs/report.json
 ```
@@ -257,7 +263,7 @@ filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
 Run tests and evals if you are modifying the code:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install ".[dev]"
 pytest
 python evals/run_evals.py
 ```
@@ -270,7 +276,7 @@ python evals/run_evals.py
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install .
-filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
+sec-filing-legal-decoder analyze examples/synthetic_legal_proceedings.md \
   --out outputs/report.md \
   --json outputs/report.json
 ```
@@ -278,7 +284,7 @@ filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
 如果你修改代码，请跑测试和 eval：
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install ".[dev]"
 pytest
 python evals/run_evals.py
 ```
@@ -288,7 +294,7 @@ python evals/run_evals.py
 Analyze an EDGAR main HTML filing:
 
 ```bash
-filing-crosswalk analyze tsla-20251231.htm \
+sec-filing-legal-decoder analyze tsla-20251231.htm \
   --out outputs/tesla-10k-report.md \
   --json outputs/tesla-10k-report.json
 ```
@@ -296,7 +302,7 @@ filing-crosswalk analyze tsla-20251231.htm \
 Analyze Markdown or TXT:
 
 ```bash
-filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
+sec-filing-legal-decoder analyze examples/synthetic_legal_proceedings.md \
   --out outputs/report.md \
   --json outputs/report.json
 ```
@@ -305,13 +311,13 @@ Analyze a PDF through MinerU only if you do not have the SEC HTML main file and
 the MinerU CLI is installed:
 
 ```bash
-filing-crosswalk analyze annual-report.pdf --parser mineru-cli --out outputs/report.md
+sec-filing-legal-decoder analyze annual-report.pdf --parser mineru-cli --out outputs/report.md
 ```
 
 Generate a management memo:
 
 ```bash
-filing-crosswalk memo examples/synthetic_internal_control.md --out outputs/memo.md
+sec-filing-legal-decoder memo examples/synthetic_internal_control.md --out outputs/memo.md
 ```
 
 ## CLI 示例
@@ -319,7 +325,7 @@ filing-crosswalk memo examples/synthetic_internal_control.md --out outputs/memo.
 分析 EDGAR HTML 主 filing：
 
 ```bash
-filing-crosswalk analyze tsla-20251231.htm \
+sec-filing-legal-decoder analyze tsla-20251231.htm \
   --out outputs/tesla-10k-report.md \
   --json outputs/tesla-10k-report.json
 ```
@@ -327,7 +333,7 @@ filing-crosswalk analyze tsla-20251231.htm \
 分析 Markdown 或 TXT：
 
 ```bash
-filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
+sec-filing-legal-decoder analyze examples/synthetic_legal_proceedings.md \
   --out outputs/report.md \
   --json outputs/report.json
 ```
@@ -335,13 +341,13 @@ filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
 只有在没有 SEC HTML 主文件、且本机已经安装 MinerU CLI 时，才建议用 MinerU 分析 PDF：
 
 ```bash
-filing-crosswalk analyze annual-report.pdf --parser mineru-cli --out outputs/report.md
+sec-filing-legal-decoder analyze annual-report.pdf --parser mineru-cli --out outputs/report.md
 ```
 
 生成 management memo：
 
 ```bash
-filing-crosswalk memo examples/synthetic_internal_control.md --out outputs/memo.md
+sec-filing-legal-decoder memo examples/synthetic_internal_control.md --out outputs/memo.md
 ```
 
 ## Tesla 10-K / 10-K/A Test Plan
@@ -365,15 +371,15 @@ Suggested flow:
 Example commands:
 
 ```bash
-filing-crosswalk analyze samples/tesla/tsla-10k.htm \
+sec-filing-legal-decoder analyze samples/tesla/tsla-10k.htm \
   --out outputs/tesla-10k-report.md \
   --json outputs/tesla-10k-report.json
 
-filing-crosswalk analyze samples/tesla/tsla-10ka.htm \
+sec-filing-legal-decoder analyze samples/tesla/tsla-10ka.htm \
   --out outputs/tesla-10ka-report.md \
   --json outputs/tesla-10ka-report.json
 
-filing-crosswalk memo samples/tesla/tsla-10ka.htm \
+sec-filing-legal-decoder memo samples/tesla/tsla-10ka.htm \
   --out outputs/tesla-10ka-memo.md
 ```
 
@@ -397,15 +403,15 @@ PDF 开始。
 示例命令：
 
 ```bash
-filing-crosswalk analyze samples/tesla/tsla-10k.htm \
+sec-filing-legal-decoder analyze samples/tesla/tsla-10k.htm \
   --out outputs/tesla-10k-report.md \
   --json outputs/tesla-10k-report.json
 
-filing-crosswalk analyze samples/tesla/tsla-10ka.htm \
+sec-filing-legal-decoder analyze samples/tesla/tsla-10ka.htm \
   --out outputs/tesla-10ka-report.md \
   --json outputs/tesla-10ka-report.json
 
-filing-crosswalk memo samples/tesla/tsla-10ka.htm \
+sec-filing-legal-decoder memo samples/tesla/tsla-10ka.htm \
   --out outputs/tesla-10ka-memo.md
 ```
 
@@ -444,13 +450,17 @@ Each analyzed paragraph produces:
 ## Architecture
 
 ```text
-src/filing_crosswalk/
+src/sec_filing_legal_decoder/
   parser_backends/       # HTML, Markdown, TXT, MinerU CLI, mock parser adapters
   classifiers/           # Rule-based section classification and triage
   crosswalk/             # Finance relevance, reading decisions, questions
   reports/               # Markdown, JSON, and memo generation
   schemas/               # Dataclass output models
   utils/                 # Text splitting and source references
+skills/
+  sec-filing-legal-decoder/
+    SKILL.md
+    skill.json
 ```
 
 The default path runs without MinerU or an LLM API key.
@@ -458,13 +468,17 @@ The default path runs without MinerU or an LLM API key.
 ## 架构
 
 ```text
-src/filing_crosswalk/
+src/sec_filing_legal_decoder/
   parser_backends/       # HTML、Markdown、TXT、MinerU CLI、mock parser adapters
   classifiers/           # 规则分类和 triage
   crosswalk/             # Finance relevance、reading decisions、questions
   reports/               # Markdown、JSON、memo 生成
   schemas/               # Dataclass output models
   utils/                 # 文本切分和 source references
+skills/
+  sec-filing-legal-decoder/
+    SKILL.md
+    skill.json
 ```
 
 默认路径不需要 MinerU，也不需要 LLM API key。

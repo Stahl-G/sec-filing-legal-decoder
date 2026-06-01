@@ -1,13 +1,13 @@
 # Contributing
 
-Thanks for improving Filling-Crosswalker.
+Thanks for improving SEC Filing Legal Decoder.
 
 ## Development
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -e ".[dev]"
+python -m pip install ".[dev]"
 pytest
 python evals/run_evals.py
 ```

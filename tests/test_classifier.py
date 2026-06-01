@@ -1,4 +1,4 @@
-from filing_crosswalk.classifiers import classify_section
+from sec_filing_legal_decoder.classifiers import classify_section
 
 
 def test_classifies_material_weakness_first():

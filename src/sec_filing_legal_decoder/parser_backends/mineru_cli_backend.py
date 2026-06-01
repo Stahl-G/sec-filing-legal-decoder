@@ -13,7 +13,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from filing_crosswalk.schemas import ParsedDocument
+from sec_filing_legal_decoder.schemas import ParsedDocument
 
 from .base import ParserBackend, ParserError
 
@@ -56,7 +56,7 @@ class MinerUCliBackend(ParserBackend):
             )
 
         command = self._command()
-        with tempfile.TemporaryDirectory(prefix="filing-crosswalk-mineru-") as tmp:
+        with tempfile.TemporaryDirectory(prefix="sec-filing-legal-decoder-mineru-") as tmp:
             output_dir = Path(tmp)
             completed = self._run(command, path, output_dir)
             markdown = self._find_markdown(output_dir)

@@ -11,9 +11,9 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from filing_crosswalk.classifiers import classify_section, triage_paragraph
-from filing_crosswalk.crosswalk.escalation_questions import generate_escalation_questions
-from filing_crosswalk.crosswalk.finance_relevance_map import guidance_for
+from sec_filing_legal_decoder.classifiers import classify_section, triage_paragraph
+from sec_filing_legal_decoder.crosswalk.escalation_questions import generate_escalation_questions
+from sec_filing_legal_decoder.crosswalk.finance_relevance_map import guidance_for
 
 
 def main() -> int:

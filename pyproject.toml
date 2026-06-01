@@ -3,22 +3,28 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "filing-crosswalk"
+name = "sec-filing-legal-decoder"
 version = "0.1.0"
-description = "Rule-based SEC filing legal-to-finance crosswalk workflow toolkit."
+description = "AI agent skill and CLI for decoding legal-heavy SEC filing sections into finance-readable risk notes, triage decisions, and escalation questions."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [
-  { name = "Filling-Crosswalker maintainers" }
+  { name = "SEC Filing Legal Decoder maintainers" }
 ]
 keywords = [
   "sec",
+  "sec-filings",
+  "10-k",
+  "20-f",
+  "40-f",
   "filings",
   "annual-reports",
   "legal",
   "finance",
-  "risk-triage"
+  "risk-triage",
+  "legal-to-finance",
+  "ai-agent"
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -38,7 +44,7 @@ dependencies = []
 dev = ["pytest>=8"]
 
 [project.scripts]
-filing-crosswalk = "filing_crosswalk.cli:main"
+sec-filing-legal-decoder = "sec_filing_legal_decoder.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

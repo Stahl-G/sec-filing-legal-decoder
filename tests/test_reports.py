@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from filing_crosswalk.crosswalk import analyze_document
-from filing_crosswalk.parser_backends.mock_backend import MockParserBackend
-from filing_crosswalk.reports import render_json_report, render_markdown_report
+from sec_filing_legal_decoder.crosswalk import analyze_document
+from sec_filing_legal_decoder.parser_backends.mock_backend import MockParserBackend
+from sec_filing_legal_decoder.reports import render_json_report, render_markdown_report
 
 
 def test_markdown_report_contains_required_sections():

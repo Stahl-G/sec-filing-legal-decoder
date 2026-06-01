@@ -1,4 +1,4 @@
-"""Structured output schemas for filing_crosswalk."""
+"""Structured output schemas for sec_filing_legal_decoder."""
 
 from .models import ParagraphAnalysis, ParsedDocument, ReviewReport
 

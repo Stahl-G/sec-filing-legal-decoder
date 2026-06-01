@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from filing_crosswalk.classifiers import classify_section, triage_paragraph
-from filing_crosswalk.schemas import ParagraphAnalysis, ParsedDocument, ReviewReport
-from filing_crosswalk.utils import source_ref, split_paragraphs
+from sec_filing_legal_decoder.classifiers import classify_section, triage_paragraph
+from sec_filing_legal_decoder.schemas import ParagraphAnalysis, ParsedDocument, ReviewReport
+from sec_filing_legal_decoder.utils import source_ref, split_paragraphs
 
 from .escalation_questions import generate_escalation_questions
 from .finance_relevance_map import guidance_for

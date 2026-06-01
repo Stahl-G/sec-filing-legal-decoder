@@ -6,7 +6,7 @@ import re
 from html.parser import HTMLParser
 from pathlib import Path
 
-from filing_crosswalk.schemas import ParsedDocument
+from sec_filing_legal_decoder.schemas import ParsedDocument
 
 from .base import ParserBackend, ParserError
 

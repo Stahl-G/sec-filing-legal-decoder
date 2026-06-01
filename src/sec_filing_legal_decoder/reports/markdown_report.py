@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 
-from filing_crosswalk.schemas import ReviewReport
+from sec_filing_legal_decoder.schemas import ReviewReport
 
 
 def render_markdown_report(report: ReviewReport) -> str:
     """Render a full filing review report in Markdown."""
 
     lines: list[str] = [
-        f"# Filing Crosswalk Review: {report.document_title}",
+        f"# SEC Filing Legal Decoder Review: {report.document_title}",
         "",
         "## Executive Summary",
         "",

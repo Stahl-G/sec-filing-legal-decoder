@@ -1,4 +1,4 @@
-"""Command-line interface for filing-crosswalk."""
+"""Command-line interface for sec-filing-legal-decoder."""
 
 from __future__ import annotations
 
@@ -6,9 +6,9 @@ import argparse
 import sys
 from pathlib import Path
 
-from filing_crosswalk.crosswalk import analyze_document
-from filing_crosswalk.parser_backends import ParserError, choose_backend
-from filing_crosswalk.reports import (
+from sec_filing_legal_decoder.crosswalk import analyze_document
+from sec_filing_legal_decoder.parser_backends import ParserError, choose_backend
+from sec_filing_legal_decoder.reports import (
     render_json_report,
     render_management_memo,
     render_markdown_report,
@@ -17,27 +17,27 @@ from filing_crosswalk.reports import (
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="filing-crosswalk",
-        description="Legal-to-finance crosswalk toolkit for filings and annual reports.",
+        prog="sec-filing-legal-decoder",
+        description="Decode legal-heavy SEC filing sections into finance-readable notes.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    analyze = subparsers.add_parser("analyze", help="Analyze Markdown, TXT, or MinerU-parsed input.")
-    analyze.add_argument("input", type=Path, help="Input Markdown/TXT/PDF/Office path.")
+    analyze = subparsers.add_parser("analyze", help="Analyze SEC HTML, Markdown, TXT, or MinerU-parsed input.")
+    analyze.add_argument("input", type=Path, help="Input HTML/Markdown/TXT/PDF/Office path.")
     analyze.add_argument(
         "--parser",
         default="auto",
-        help="Parser backend: auto, markdown, text, mineru-cli, or mock.",
+        help="Parser backend: auto, html, markdown, text, mineru-cli, or mock.",
     )
     analyze.add_argument("--out", type=Path, help="Markdown report output path.")
     analyze.add_argument("--json", type=Path, help="JSON report output path.")
 
     memo = subparsers.add_parser("memo", help="Generate a management memo Markdown file.")
-    memo.add_argument("input", type=Path, help="Input Markdown/TXT/PDF/Office path.")
+    memo.add_argument("input", type=Path, help="Input HTML/Markdown/TXT/PDF/Office path.")
     memo.add_argument(
         "--parser",
         default="auto",
-        help="Parser backend: auto, markdown, text, mineru-cli, or mock.",
+        help="Parser backend: auto, html, markdown, text, mineru-cli, or mock.",
     )
     memo.add_argument("--out", type=Path, required=True, help="Memo output path.")
 

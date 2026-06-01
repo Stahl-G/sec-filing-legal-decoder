@@ -1,4 +1,4 @@
-from filing_crosswalk.crosswalk.escalation_questions import generate_escalation_questions
+from sec_filing_legal_decoder.crosswalk.escalation_questions import generate_escalation_questions
 
 
 def test_legal_proceedings_questions_include_core_roles():

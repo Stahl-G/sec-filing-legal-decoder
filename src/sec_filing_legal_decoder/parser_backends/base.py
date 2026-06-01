@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from filing_crosswalk.schemas import ParsedDocument
+from sec_filing_legal_decoder.schemas import ParsedDocument
 
 
 class ParserError(RuntimeError):

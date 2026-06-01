@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from filing_crosswalk.parser_backends import (
+from sec_filing_legal_decoder.parser_backends import (
     HtmlParserBackend,
     MarkdownParserBackend,
     MinerUCliBackend,
