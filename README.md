@@ -154,6 +154,25 @@ memo 输出。
 其许可证是基于 Apache 2.0 并带有额外条件的 MinerU Open Source License。本项目
 不隶属于 OpenDataLab 或 MinerU。用户应自行遵守 MinerU 的许可证和服务条款。
 
+## Do I Need MinerU?
+
+Usually no.
+
+For SEC `10-K`, `10-Q`, `20-F`, and `40-F` filings, use the official EDGAR
+`.htm` / `.html` main filing whenever available.
+
+MinerU is only an optional fallback for PDF, Office, image, or non-EDGAR
+documents.
+
+## 我需要 MinerU 吗？
+
+通常不需要。
+
+如果分析的是 SEC `10-K`、`10-Q`、`20-F`、`40-F`，优先使用 EDGAR 官方
+`.htm` / `.html` 主 filing 文件。
+
+MinerU 只是可选 fallback，适合 PDF、Office、图片或非 EDGAR 文档。
+
 ## Quick Start For Agent Users
 
 This project is designed to be agent-readable. If you are using Codex, Claude
@@ -194,6 +213,356 @@ https://github.com/Stahl-G/sec-filing-legal-decoder
 章节。请输出 Markdown review report、JSON structured report，并在有必要时生成
 management memo。不要把输出当作法律、投资、会计或审计意见。
 ```
+
+## Installation Guide For Beginners
+
+If you are new to Python CLI tools, install only the required tools first.
+MinerU and Obsidian are optional.
+
+### 1. Required Tools
+
+You need:
+
+- Python 3.10 or later
+- Git
+- A terminal:
+  - macOS: Terminal or iTerm2
+  - Windows: PowerShell, Windows Terminal, or Git Bash
+  - Linux: your default terminal
+
+Check your Python version:
+
+```bash
+python --version
+```
+
+If that does not work, try:
+
+```bash
+python3 --version
+```
+
+This project requires Python 3.10 or later.
+
+Check Git:
+
+```bash
+git --version
+```
+
+### 2. Clone The Repository
+
+```bash
+git clone https://github.com/Stahl-G/sec-filing-legal-decoder.git
+cd sec-filing-legal-decoder
+```
+
+### 3. Create A Virtual Environment
+
+macOS / Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+Windows CMD:
+
+```cmd
+python -m venv .venv
+.venv\Scripts\activate.bat
+```
+
+### 4. Install The Project
+
+```bash
+python -m pip install .
+```
+
+For development or testing:
+
+```bash
+python -m pip install ".[dev]"
+```
+
+### 5. Run The Smoke Test
+
+```bash
+sec-filing-legal-decoder analyze examples/synthetic_legal_proceedings.md \
+  --out outputs/report.md \
+  --json outputs/report.json
+```
+
+Expected outputs:
+
+- `outputs/report.md`
+- `outputs/report.json`
+
+If this works, your local installation is ready.
+
+### 6. Optional: Install Obsidian
+
+Obsidian is optional. You only need it if you want to read the generated notes
+as a local knowledge base.
+
+After installing Obsidian, create or choose a vault folder. Then run:
+
+```bash
+sec-filing-legal-decoder analyze examples/synthetic_sec_inline_xbrl.htm \
+  --out outputs/html-report.md \
+  --json outputs/html-report.json \
+  --obsidian-vault ~/Documents/ObsidianVault \
+  --obsidian-folder "SEC Filings/Sample/2025 10-K" \
+  --company "Sample Company" \
+  --ticker SAMPLE \
+  --form 10-K \
+  --year 2025
+```
+
+Replace `~/Documents/ObsidianVault` with your own Obsidian vault path.
+
+### 7. Optional: Install MinerU
+
+MinerU is optional. You do not need MinerU for standard SEC `.htm` / `.html`
+main filing files.
+
+Use MinerU only when you need to parse PDF, DOCX, PPTX, XLSX, images, or other
+non-EDGAR HTML documents.
+
+If MinerU is not installed, you can still use this project with:
+
+- SEC `.htm` / `.html` main filing files
+- Markdown files
+- TXT files
+
+### 8. Recommended Source Format
+
+For SEC filings, prefer the official EDGAR main filing document:
+
+1. `.htm` / `.html` main filing file: recommended
+2. `.txt` SEC submission package: useful for archiving and completeness checks
+3. `.pdf`: only use when HTML is unavailable or the document is not a standard
+   EDGAR filing
+
+### 9. Troubleshooting
+
+If the command is not found:
+
+```bash
+sec-filing-legal-decoder --help
+```
+
+does not work, try reinstalling inside your activated virtual environment:
+
+```bash
+python -m pip install .
+```
+
+If your virtual environment is not active, activate it again.
+
+macOS / Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Windows PowerShell:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+If you see a Python version error, install Python 3.10 or later.
+
+### 10. Safety Reminder
+
+Do not upload or commit confidential company documents, material non-public
+information, credentials, raw logs, personal data, or internal legal/finance
+advice.
+
+This project is a filing-reading and triage aid. It is not legal advice,
+investment advice, accounting advice, audit advice, or a substitute for
+qualified professional review.
+
+## 新手安装指南
+
+如果你第一次使用 Python CLI 工具，先安装必需工具即可。MinerU 和 Obsidian 都是
+可选项。
+
+### 1. 必需工具
+
+你需要：
+
+- Python 3.10 或更高版本
+- Git
+- 一个 terminal：
+  - macOS: Terminal 或 iTerm2
+  - Windows: PowerShell、Windows Terminal 或 Git Bash
+  - Linux: 默认 terminal
+
+检查 Python 版本：
+
+```bash
+python --version
+```
+
+如果不工作，试试：
+
+```bash
+python3 --version
+```
+
+本项目要求 Python 3.10 或更高版本。
+
+检查 Git：
+
+```bash
+git --version
+```
+
+### 2. Clone 仓库
+
+```bash
+git clone https://github.com/Stahl-G/sec-filing-legal-decoder.git
+cd sec-filing-legal-decoder
+```
+
+### 3. 创建虚拟环境
+
+macOS / Linux:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+Windows CMD:
+
+```cmd
+python -m venv .venv
+.venv\Scripts\activate.bat
+```
+
+### 4. 安装项目
+
+```bash
+python -m pip install .
+```
+
+如果你要开发或跑测试：
+
+```bash
+python -m pip install ".[dev]"
+```
+
+### 5. 运行 smoke test
+
+```bash
+sec-filing-legal-decoder analyze examples/synthetic_legal_proceedings.md \
+  --out outputs/report.md \
+  --json outputs/report.json
+```
+
+预期输出：
+
+- `outputs/report.md`
+- `outputs/report.json`
+
+如果这一步成功，本地安装就已经可用。
+
+### 6. 可选：安装 Obsidian
+
+Obsidian 是可选的。只有当你想把生成结果作为本地知识库阅读时，才需要安装
+Obsidian。
+
+安装 Obsidian 后，创建或选择一个 vault 文件夹，然后运行：
+
+```bash
+sec-filing-legal-decoder analyze examples/synthetic_sec_inline_xbrl.htm \
+  --out outputs/html-report.md \
+  --json outputs/html-report.json \
+  --obsidian-vault ~/Documents/ObsidianVault \
+  --obsidian-folder "SEC Filings/Sample/2025 10-K" \
+  --company "Sample Company" \
+  --ticker SAMPLE \
+  --form 10-K \
+  --year 2025
+```
+
+把 `~/Documents/ObsidianVault` 替换成你自己的 Obsidian vault 路径。
+
+### 7. 可选：安装 MinerU
+
+MinerU 是可选的。标准 SEC `.htm` / `.html` 主 filing 文件不需要 MinerU。
+
+只有在需要解析 PDF、DOCX、PPTX、XLSX、图片或其他非 EDGAR HTML 文档时，才使用
+MinerU。
+
+即使没有安装 MinerU，本项目仍然可以分析：
+
+- SEC `.htm` / `.html` 主 filing 文件
+- Markdown 文件
+- TXT 文件
+
+### 8. 推荐源文件格式
+
+分析 SEC filing 时，优先使用 EDGAR 官方主 filing 文件：
+
+1. `.htm` / `.html` 主 filing 文件：推荐
+2. SEC `.txt` submission package：适合归档和完整性检查
+3. `.pdf`：只有在没有 HTML，或文档不是标准 EDGAR filing 时再用
+
+### 9. 常见问题
+
+如果命令不存在：
+
+```bash
+sec-filing-legal-decoder --help
+```
+
+无法运行，请在已激活的虚拟环境中重新安装：
+
+```bash
+python -m pip install .
+```
+
+如果虚拟环境没有激活，请重新激活。
+
+macOS / Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Windows PowerShell:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+如果遇到 Python 版本错误，请安装 Python 3.10 或更高版本。
+
+### 10. 安全提醒
+
+不要上传或提交公司机密文件、重大非公开信息、凭证、原始日志、个人数据或内部
+法律/财务意见。
+
+本项目只是 filing 阅读和 triage aid。它不是法律意见、投资意见、会计意见、审计
+意见，也不能替代合格专业人士 review。
 
 ## First Smoke Test
 
