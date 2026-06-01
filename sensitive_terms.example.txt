@@ -1,0 +1,6 @@
+# Copy this file to sensitive_terms.txt and add private terms locally.
+# sensitive_terms.txt is gitignored.
+#
+# Do not add real employer names, internal company names, private issuer names,
+# credentials, or material non-public information to this example file.
+# Put one private term per line in your local sensitive_terms.txt.

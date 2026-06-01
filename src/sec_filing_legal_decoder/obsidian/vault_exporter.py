@@ -1,4 +1,4 @@
-"""Obsidian note export for v0.3 legal risk cards."""
+"""Obsidian note export for v0.4 legal risk cards."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from sec_filing_legal_decoder.schemas import RiskCard, RiskCardReport
 
 @dataclass(frozen=True)
 class RiskCardObsidianOptions:
-    """Options for writing v0.3 risk-card notes."""
+    """Options for writing v0.4 risk-card notes."""
 
     output_dir: Path
     lang: str = "en"
@@ -92,7 +92,7 @@ def _dashboard(
         *_frontmatter("legal-risk-dashboard", context),
         f"# {context['company']} Legal Risk Dashboard".strip(),
         "",
-        "> [!summary] v0.3 Legal Risk Cards",
+        "> [!summary] v0.4 Source-Only Legal Risk Cards",
         "> This dashboard links issue-level legal, regulatory, governance, audit, disclosure, debt, related-party, dilution, and material-contract risk cards.",
         "",
         "## Key Outputs",

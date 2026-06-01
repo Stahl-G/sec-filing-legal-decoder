@@ -9,8 +9,8 @@ from sec_filing_legal_decoder.schemas import ParsedDocument
 
 def test_detects_earnings_release_6k():
     document = ParsedDocument(
-        source_path="CSIQ 26Q1.html",
-        content="Form 6-K Exhibit 99.1 Canadian Solar Reports First Quarter Results.",
+        source_path="sample-issuer-6k.html",
+        content="Form 6-K Exhibit 99.1 Sample Solar Manufacturer Reports First Quarter Results.",
         parser_backend="html",
         title="Form 6-K",
     )
@@ -52,7 +52,7 @@ def test_router_does_not_treat_guidance_kpi_as_disclosure_risk():
 
 def test_risk_card_report_groups_issue_level_cards():
     document = ParsedDocument(
-        source_path="toyo-20f.htm",
+        source_path="sample-small-fpi-20f.htm",
         content=(
             "Form 20-F Annual Report\n\n"
             "The auditor expressed substantial doubt about the company's ability to continue as a going concern.\n\n"
@@ -61,7 +61,7 @@ def test_risk_card_report_groups_issue_level_cards():
             "Revenue increased 12% and gross margin improved due to shipment growth."
         ),
         parser_backend="html",
-        title="TOYO 20-F",
+        title="Sample Small FPI 20-F",
     )
 
     report = generate_risk_card_report(document)
@@ -78,9 +78,9 @@ def test_risk_card_report_groups_issue_level_cards():
     assert all(card.issuer_specific_interpretation for card in report.risk_cards)
 
 
-def test_nvidia_like_evidence_filtering_and_synthesis():
+def test_large_issuer_evidence_filtering_and_synthesis():
     document = ParsedDocument(
-        source_path="nvda-10k.htm",
+        source_path="sample-ai-chip-issuer-10k.htm",
         content=(
             "Form 10-K Annual Report\n\n"
             "The Tax Identification Number (TIN), also known as an Employer Identification Number (EIN), is a unique 9-digit value assigned by the IRS.\n\n"
@@ -90,7 +90,7 @@ def test_nvidia_like_evidence_filtering_and_synthesis():
             "The maximum gross exposure under all agreements is $3.5 billion, which is reduced as the partners make payments to the lessors over terms ranging from 5 to 7 years. "
             "The partners have placed $712 million in escrow to mitigate our potential exposure. "
             "The guarantees, classified as credit derivatives with changes in fair value recognized in Other income and expense, were not material.\n\n"
-            "Groq In December 2025, we entered into a non-exclusive license agreement with Groq, Inc. for its language processing unit technology and hired certain Groq employees. "
+            "Sample Accelerator Licensor In December 2025, we entered into a non-exclusive license agreement with Sample Accelerator Licensor, Inc. for its language processing unit technology and hired certain employees. "
             "No customer contracts, existing products, or equity interests were purchased. "
             "We recorded $14.4 billion of goodwill and a $2.5 billion developed technology intangible asset, valued using a cost-to-recreate methodology with a five-year useful life.\n\n"
             "As of January 25, 2026, there are no accrued contingent liabilities associated with the legal proceedings described above based on our belief that liabilities, while reasonably possible, are not probable. "
@@ -99,7 +99,7 @@ def test_nvidia_like_evidence_filtering_and_synthesis():
             "Our Board of Directors oversees cybersecurity governance, incident response, vendor risk, and materiality assessment for cybersecurity incidents."
         ),
         parser_backend="html",
-        title="NVIDIA 10-K",
+        title="Sample AI Chip Issuer 10-K",
     )
 
     report = generate_risk_card_report(document)
@@ -167,7 +167,7 @@ def test_cli_risk_cards_supports_zh_cn_bilingual_output(tmp_path: Path):
     input_path.write_text(
         "<html><body><p>Form 10-K Annual Report</p>"
         "<p>As of January 25, 2026, there are no accrued contingent liabilities associated with the legal proceedings described above because liabilities, while reasonably possible, are not probable.</p>"
-        "<p>Groq In December 2025, we entered into a non-exclusive license agreement and recorded $14.4 billion of goodwill and a $2.5 billion developed technology intangible asset.</p>"
+        "<p>Sample Accelerator Licensor In December 2025, we entered into a non-exclusive license agreement and recorded $14.4 billion of goodwill and a $2.5 billion developed technology intangible asset.</p>"
         "</body></html>",
         encoding="utf-8",
     )

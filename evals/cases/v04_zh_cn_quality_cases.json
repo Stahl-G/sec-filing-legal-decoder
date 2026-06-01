@@ -1,0 +1,8 @@
+[
+  {
+    "name": "zh_cn_keeps_source_excerpt_and_hides_raw_ui_terms",
+    "text": "The auditor expressed substantial doubt about the company's ability to continue as a going concern.",
+    "expected_terms": ["法律风险复核", "substantial doubt"],
+    "forbidden_terms": ["route out", "Priority:", "Owners:", "read-first", "appendix-level", "lower-priority"]
+  }
+]

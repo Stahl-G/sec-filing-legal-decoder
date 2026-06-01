@@ -15,15 +15,15 @@ def test_obsidian_export_writes_linked_note_set(tmp_path: Path):
         report,
         ObsidianExportOptions(
             vault=tmp_path,
-            folder="SEC Filings/TSLA/2025 10-K",
-            company="Tesla, Inc.",
-            ticker="TSLA",
+            folder="SEC Filings/SAMPLE/2025 10-K",
+            company="Sample Issuer Inc.",
+            ticker="SAMPLE",
             form="10-K",
             year="2025",
         ),
     )
 
-    base = tmp_path / "SEC Filings" / "TSLA" / "2025 10-K"
+    base = tmp_path / "SEC Filings" / "SAMPLE" / "2025 10-K"
     assert base.joinpath("00 Dashboard.md").exists()
     assert base.joinpath("02 Reading Decision Index.md").exists()
     assert base.joinpath("03 Escalation Matrix.md").exists()
@@ -33,7 +33,7 @@ def test_obsidian_export_writes_linked_note_set(tmp_path: Path):
 
     dashboard = base.joinpath("00 Dashboard.md").read_text(encoding="utf-8")
     assert "[[01 Executive Summary]]" in dashboard
-    assert "Tesla, Inc." in dashboard
+    assert "Sample Issuer Inc." in dashboard
     assert "ESCALATE" in dashboard
 
     index = base.joinpath("02 Reading Decision Index.md").read_text(encoding="utf-8")
@@ -62,11 +62,11 @@ def test_cli_analyze_obsidian_export(tmp_path: Path):
             "--obsidian-vault",
             str(vault),
             "--obsidian-folder",
-            "SEC Filings/TSLA/2025 10-K",
+            "SEC Filings/SAMPLE/2025 10-K",
             "--company",
-            "Tesla, Inc.",
+            "Sample Issuer Inc.",
             "--ticker",
-            "TSLA",
+            "SAMPLE",
             "--form",
             "10-K",
             "--year",
@@ -75,27 +75,27 @@ def test_cli_analyze_obsidian_export(tmp_path: Path):
     )
 
     assert result == 0
-    assert vault.joinpath("SEC Filings", "TSLA", "2025 10-K", "00 Dashboard.md").exists()
+    assert vault.joinpath("SEC Filings", "SAMPLE", "2025 10-K", "00 Dashboard.md").exists()
 
 
 def test_risk_card_obsidian_export_writes_cards(tmp_path: Path):
     document = ParsedDocument(
-        source_path="toyo-20f.htm",
+        source_path="sample-solar-manufacturer-20f.htm",
         content=(
             "Form 20-F Annual Report\n\n"
             "The company disclosed UFLPA, AD/CVD, tariff, and ITC 337 patent litigation risk.\n\n"
             "The company has warrants and earnout shares that may dilute shareholders."
         ),
         parser_backend="html",
-        title="TOYO 20-F",
+        title="Sample Solar Manufacturer 20-F",
     )
     report = generate_risk_card_report(document)
     written = export_risk_cards_to_obsidian(
         report,
         RiskCardObsidianOptions(
             output_dir=tmp_path / "obsidian",
-            company="TOYO Co., Ltd.",
-            ticker="TOYO",
+            company="Sample Solar Manufacturer",
+            ticker="SAMPLE",
             form="20-F",
             year="2025",
         ),

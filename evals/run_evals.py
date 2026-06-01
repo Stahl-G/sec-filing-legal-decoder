@@ -1,4 +1,4 @@
-"""Run deterministic v0.1 eval cases."""
+"""Run deterministic eval cases."""
 
 from __future__ import annotations
 
@@ -14,6 +14,10 @@ if str(SRC) not in sys.path:
 from sec_filing_legal_decoder.classifiers import classify_section, triage_paragraph
 from sec_filing_legal_decoder.crosswalk.escalation_questions import generate_escalation_questions
 from sec_filing_legal_decoder.crosswalk.finance_relevance_map import guidance_for
+from sec_filing_legal_decoder.reports import render_integrated_legal_risk_review
+from sec_filing_legal_decoder.reports.zh_cn_reports import render_integrated_legal_risk_review_zh_cn
+from sec_filing_legal_decoder.risk_cards import generate_risk_card_report
+from sec_filing_legal_decoder.schemas import ParsedDocument
 
 
 def main() -> int:
@@ -22,6 +26,9 @@ def main() -> int:
     failures.extend(_eval_triage())
     failures.extend(_eval_escalation())
     failures.extend(_eval_finance_mapping())
+    failures.extend(_eval_v04_risk_cards())
+    failures.extend(_eval_v04_issuer_profiles())
+    failures.extend(_eval_v04_zh_cn_quality())
 
     passed = "PASS" if not failures else "FAIL"
     total = _case_count()
@@ -83,13 +90,74 @@ def _eval_finance_mapping() -> list[str]:
     return failures
 
 
+def _eval_v04_risk_cards() -> list[str]:
+    failures: list[str] = []
+    for case in _load("v04_risk_card_cases.json"):
+        report = generate_risk_card_report(_document(str(case["text"])))
+        expected_count = case.get("expected_card_count")
+        if expected_count is not None and len(report.risk_cards) != int(expected_count):
+            failures.append(
+                f"v04_risk_cards/{case['name']}: expected {expected_count} cards, got {len(report.risk_cards)}"
+            )
+        markdown = render_integrated_legal_risk_review(report).lower()
+        for term in case.get("forbidden_terms", []):
+            if str(term).lower() in markdown:
+                failures.append(f"v04_risk_cards/{case['name']}: forbidden term {term}")
+    return failures
+
+
+def _eval_v04_issuer_profiles() -> list[str]:
+    failures: list[str] = []
+    for case in _load("v04_issuer_profile_cases.json"):
+        report = generate_risk_card_report(_document(str(case["text"])), issuer_profile=str(case["profile"]))
+        card = next((card for card in report.risk_cards if card.risk_domain == case["expected_domain"]), None)
+        if card is None:
+            failures.append(f"v04_issuer_profiles/{case['name']}: missing domain {case['expected_domain']}")
+            continue
+        if card.priority != case["expected_priority"]:
+            failures.append(
+                f"v04_issuer_profiles/{case['name']}: expected priority {case['expected_priority']}, got {card.priority}"
+            )
+        if card.recommended_review_posture != case["expected_posture"]:
+            failures.append(
+                f"v04_issuer_profiles/{case['name']}: expected posture {case['expected_posture']}, got {card.recommended_review_posture}"
+            )
+    return failures
+
+
+def _eval_v04_zh_cn_quality() -> list[str]:
+    failures: list[str] = []
+    for case in _load("v04_zh_cn_quality_cases.json"):
+        report = generate_risk_card_report(_document(str(case["text"])), issuer_profile="small-issuer")
+        markdown = render_integrated_legal_risk_review_zh_cn(report)
+        for term in case["expected_terms"]:
+            if str(term) not in markdown:
+                failures.append(f"v04_zh_cn_quality/{case['name']}: missing term {term}")
+        for term in case["forbidden_terms"]:
+            if str(term) in markdown:
+                failures.append(f"v04_zh_cn_quality/{case['name']}: forbidden term {term}")
+    return failures
+
+
 def _case_count() -> int:
     return sum(len(_load(name)) for name in [
         "classifier_cases.json",
         "triage_cases.json",
         "escalation_cases.json",
         "finance_mapping_cases.json",
+        "v04_risk_card_cases.json",
+        "v04_issuer_profile_cases.json",
+        "v04_zh_cn_quality_cases.json",
     ])
+
+
+def _document(text: str) -> ParsedDocument:
+    return ParsedDocument(
+        source_path="eval-sample.htm",
+        content=f"Form 20-F Annual Report\n\n{text}",
+        parser_backend="html",
+        title="Sample Eval Filing",
+    )
 
 
 if __name__ == "__main__":

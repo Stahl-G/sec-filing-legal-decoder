@@ -34,6 +34,21 @@ OWNER_LABELS = {
     "Board": "Board / 董事会",
 }
 
+PRIORITY_LABELS = {
+    "Critical": "紧急",
+    "High": "高",
+    "Medium": "中",
+    "Low": "低",
+    "Monitor": "观察",
+}
+
+READING_DECISION_LABELS = {
+    "ESCALATE": "升级确认",
+    "DEEP_READ": "深读",
+    "READ": "阅读",
+    "SKIM": "略读",
+}
+
 DOMAIN_READS = {
     "legal_proceedings_litigation": (
         "这张卡不判断公司是否已经违法，也不直接判断赔付金额。它把诉讼阶段、probable / reasonably possible / remote、accrual、range of loss 和披露阈值拆成需要核查的问题。"
@@ -81,6 +96,56 @@ CAUTION_BY_DOMAIN = {
     "cybersecurity_governance": "不能据此认定已经发生 material cyber incident；应核查事件事实、materiality assessment、board reporting 和 response controls。",
 }
 
+ZH_QUESTIONS: dict[str, dict[str, list[str]]] = {
+    "legal_proceedings_litigation": {
+        "Legal": [
+            "相关 litigation / proceeding 目前处于什么阶段？",
+            "是否存在 reasonably possible loss、settlement、fine、injunction 或 regulatory proceeding 风险？",
+        ],
+        "Finance": [
+            "是否已经形成 accrual，或是否需要披露 range of loss？",
+            "是否存在 insurance recovery、indemnity 或现金流时间点问题？",
+        ],
+        "IR": ["对外表述是否避免把未决事项写成已解决、无风险或不重大？"],
+    },
+    "internal_control_reporting": {
+        "Auditor": [
+            "material weakness / ICFR 问题影响哪些流程、系统、账户或估计？",
+            "remediation 是否已有足够测试证据支持？",
+        ],
+        "Finance": ["受影响的 close process、估计和披露控制是否已列入整改计划？"],
+        "Legal": ["披露是否清楚区分已发现缺陷和 remediation plan？"],
+    },
+    "audit_going_concern": {
+        "Finance": [
+            "12 个月现金流预测是否覆盖 short-term debt、working capital 和 committed capex？",
+            "哪些缓解措施是 committed funding，哪些仍依赖未来融资或经营改善？",
+        ],
+        "Auditor": ["going concern / substantial doubt 结论依赖哪些关键假设？"],
+        "Board": ["董事会是否复核 downside scenario、融资替代方案和 covenant / liquidity trigger？"],
+    },
+    "guarantees_commitments": {
+        "Finance": ["maximum exposure、mitigation、fair-value treatment 和预计现金流风险如何区分？"],
+        "Legal": ["guarantee、termination、indemnity 和 performance obligation 是否披露清楚？"],
+        "Management": ["哪些 commitment 是 firm、cancellable、customer-dependent 或取决于 counterparty performance？"],
+    },
+    "equity_dilution_control": {
+        "Finance": ["warrants、earnout、convertible notes 或 PIPE 对 dilution、EPS 和 fair value 有什么敏感性？"],
+        "Legal": ["conversion / exercise、registration rights、voting rights 和 change-of-control 条款是否完整反映？"],
+        "IR": ["投资者沟通是否区分非现金 fair-value 波动和经营表现？"],
+    },
+    "tax_cross_border": {
+        "Finance": ["deferred tax assets、valuation allowance 和 more-likely-than-not 假设是否有 jurisdictional taxable income 支持？"],
+        "Auditor": ["tax reserve / uncertain tax position 分析是否与 filing wording 一致？"],
+        "Legal": ["是否存在 tax authority challenge、transfer pricing 或 remittance restriction 风险？"],
+    },
+    "cybersecurity_governance": {
+        "Legal": ["cybersecurity disclosure 是否只是 governance / process disclosure，还是涉及 material incident 判断？"],
+        "Management": ["incident response、vendor risk、board reporting 和 remediation 的责任人是否明确？"],
+        "Board": ["董事会监督频率、升级机制和 materiality assessment 是否有记录支持？"],
+    },
+}
+
 
 def render_integrated_legal_risk_review_zh_cn(report: RiskCardReport, term_style: str = "bilingual") -> str:
     """Render the read-first integrated report in Chinese bilingual style."""
@@ -93,7 +158,7 @@ def render_integrated_legal_risk_review_zh_cn(report: RiskCardReport, term_style
         f"# 法律风险复核: {report.document.title}",
         "",
         "> [!summary] 阅读目的",
-        "> 这是一份 read-first 的 legal-to-finance 复核报告。它先给出主线风险，再把原文证据和卡片细节放到后面，方便 agent 或人工继续深读。",
+        "> 这是一份优先阅读的 legal-to-finance 复核报告。它先给出主线风险，再把原文证据和卡片细节放到后面，方便 agent 或人工继续深读。",
         "",
         "## 核心结论",
         "",
@@ -117,10 +182,10 @@ def render_legal_risk_cards_report_zh_cn(report: RiskCardReport, term_style: str
         *_frontmatter(report, "法律风险卡片", "risk-cards"),
         f"# 法律风险卡片: {report.document.title}",
         "",
-        "> [!summary] v0.3 范围",
+        "> [!summary] v0.4 source-only 范围",
         "> 本报告不复述普通 revenue、margin、EPS、valuation 或 peer-comparison 分析；它把法律、监管、审计、治理、披露、税务、担保和重大合同语言转成 finance reader 可执行的核查卡片。",
         "",
-        "## Filing Context / 文件背景",
+        "## 文件背景",
         "",
         f"- Source: `{report.document.source_path}`",
         f"- Parser backend: `{report.document.parser_backend}`",
@@ -134,9 +199,9 @@ def render_legal_risk_cards_report_zh_cn(report: RiskCardReport, term_style: str
         [card for card in report.risk_cards if card.recommended_review_posture != "read-first"],
         term_style,
     ))
-    lines.extend(["## Risk Cards / 风险卡片", ""])
+    lines.extend(["## 风险卡片", ""])
     if not report.risk_cards:
-        lines.extend(["未生成法律风险卡片；普通财务 KPI 段落可能已被 route out。", ""])
+        lines.extend(["未生成法律风险卡片；普通财务 KPI 段落可能已被排除。", ""])
     for card in report.risk_cards:
         lines.extend(_zh_card(card, term_style))
     lines.extend(["> [!caution] 免责声明", *_quote_lines(_zh_disclaimer()), ""])
@@ -164,7 +229,10 @@ def render_escalation_questions_report_zh_cn(report: RiskCardReport, term_style:
     for owner, entries in by_owner.items():
         lines.extend([f"## {_owner(owner)}", ""])
         for card, question in entries:
-            lines.append(f"- **{card.card_id} {_domain_title(card, term_style)}** (`{card.priority}`): 应核查 / Please verify: {question}")
+            lines.append(
+                f"- **{card.card_id} {_domain_title(card, term_style)}**（{_priority(card.priority)}）："
+                f"{_zh_question(card, owner, question)}"
+            )
         lines.append("")
     lines.extend(["> [!caution] 免责声明", *_quote_lines(_zh_disclaimer()), ""])
     return "\n".join(lines).rstrip() + "\n"
@@ -179,20 +247,20 @@ def render_management_follow_up_report_zh_cn(report: RiskCardReport, term_style:
         f"# 管理层跟进事项: {report.document.title}",
         "",
         "> [!summary] 用途",
-        "> 这是一份 Legal、Finance、Auditor、IR、Management 和 Board 的 triage checklist，不是专业结论。",
+        "> 这是一份面向 Legal / 法务、Finance / 财务、Auditor / 审计师、IR / 投资者关系、Management / 管理层和 Board / 董事会的跟进清单，不是专业结论。",
         "",
         "## 优先跟进事项",
         "",
     ]
     read_first = [card for card in report.risk_cards if card.recommended_review_posture == "read-first"]
     if not read_first:
-        lines.extend(["未生成 read-first 跟进事项。", ""])
+        lines.extend(["未生成优先阅读跟进事项。", ""])
     for card in read_first:
-        lines.append(f"- **{card.card_id} {_domain_title(card, term_style)}**: 需要确认 / Confirm: {card.suggested_management_follow_up}")
+        lines.append(f"- **{card.card_id} {_domain_title(card, term_style)}**：需确认：{card.suggested_management_follow_up}")
     lines.extend(["", "## 披露口径校准", ""])
     if report.disclosure_consistency_questions:
         for question in report.disclosure_consistency_questions:
-            lines.append(f"- 不宜直接推断；应核查 / Calibrate wording: {question}")
+            lines.append(f"- 不宜直接推断；应核查披露口径：{question}")
     else:
         lines.append("- 未生成 disclosure calibration 问题。")
     lines.extend(["", "> [!caution] 免责声明", *_quote_lines(_zh_disclaimer()), ""])
@@ -213,8 +281,8 @@ def _zh_executive_takeaway(
     suppressed = sum(len(card.weak_or_suppressed_sources) for card in report.risk_cards)
     return (
         f"本次应优先阅读的法律风险主线是：{names}。系统分析了 {report.coverage_summary.paragraphs_total} 个段落，"
-        f"route out 了 {report.coverage_summary.financial_kpi_routed_out} 个普通财务 KPI 段落，生成 "
-        f"{len(report.risk_cards)} 张事项级风险卡，其中 {len(appendix)} 张属于 appendix / lower-priority。"
+        f"已排除  {report.coverage_summary.financial_kpi_routed_out} 个普通财务 KPI 段落，生成 "
+        f"{len(report.risk_cards)} 张事项级风险卡，其中 {len(appendix)} 张属于附录级 / 较低优先级。"
         f"{suppressed} 个弱证据、taxonomy-like 或非发行人具体事实的 excerpt 已从主叙事中压低或剔除。"
     )
 
@@ -223,12 +291,12 @@ def _zh_priority_map(read_first: list[RiskCard], appendix: list[RiskCard], term_
     lines = [
         "## 风险优先级地图",
         "",
-        "| 阅读位置 | Priority | Risk | 为什么重要 | 主要 owner |",
+        "| 阅读位置 | 优先级 | 风险主题 | 为什么重要 | 主要确认方 |",
         "| --- | --- | --- | --- | --- |",
     ]
     for card in read_first + appendix:
         lines.append(
-            f"| {_posture(card.recommended_review_posture)} | {card.priority} | {card.card_id} {_domain_title(card, term_style)} | "
+            f"| {_posture(card.recommended_review_posture)} | {_priority(card.priority)} | {card.card_id} {_domain_title(card, term_style)} | "
             f"{_table_cell(_zh_domain_read(card))} | {', '.join(_owner(owner) for owner in card.owners)} |"
         )
     lines.append("")
@@ -238,7 +306,7 @@ def _zh_priority_map(read_first: list[RiskCard], appendix: list[RiskCard], term_
 def _zh_themes(cards: list[RiskCard], term_style: str) -> list[str]:
     lines = ["## 重点法务风险主题", ""]
     if not cards:
-        return lines + ["没有卡片达到 read-first 证据阈值。", ""]
+        return lines + ["没有卡片达到优先阅读证据阈值。", ""]
     for index, card in enumerate(cards, start=1):
         lines.extend(_zh_theme(index, card, term_style))
     return lines
@@ -249,12 +317,12 @@ def _zh_theme(index: int, card: RiskCard, term_style: str) -> list[str]:
         f"### {index}. {_domain_title(card, term_style)}",
         "",
         f"- Card: `{card.card_id}`",
-        f"- Domain: `{card.risk_domain}`",
-        f"- Priority: `{card.priority}`",
-        f"- Evidence quality: `{card.evidence_quality}`",
-        f"- Owners: {', '.join(_owner(owner) for owner in card.owners)}",
+        f"- 风险域：`{card.risk_domain}`",
+        f"- 优先级：`{_priority(card.priority)}`",
+        f"- 证据质量：`{card.evidence_quality}`",
+        f"- 主要确认方：{', '.join(_owner(owner) for owner in card.owners)}",
         "",
-        "#### 这和普通财务分析的差异",
+        "#### 普通财务分析可能会怎么误读",
         "",
         _zh_domain_difference(card),
         "",
@@ -264,11 +332,11 @@ def _zh_theme(index: int, card: RiskCard, term_style: str) -> list[str]:
     if card.issuer_specific_facts:
         lines.extend([f"- {fact}" for fact in card.issuer_specific_facts[:6]])
     else:
-        lines.append("- 未抽取到足够简洁的 issuer-specific facts；需要回看 Source Excerpts。")
+        lines.append("- 未抽取到足够简洁的 issuer-specific facts；需要回看原文证据。")
     lines.extend(
         [
             "",
-            "#### Finance Reader 应如何理解",
+            "#### 金融读者应如何理解",
             "",
             _zh_domain_read(card),
             "",
@@ -282,7 +350,7 @@ def _zh_theme(index: int, card: RiskCard, term_style: str) -> list[str]:
     )
     questions = _first_questions(card)
     if questions:
-        lines.extend([f"- 应核查 / Please verify: {question}" for question in questions])
+        lines.extend([f"- {question}" for question in questions])
     else:
         lines.append("- 应指定 Legal、Finance、Auditor、IR 或 Management 核查原文事实和披露口径。")
     lines.extend(
@@ -292,7 +360,7 @@ def _zh_theme(index: int, card: RiskCard, term_style: str) -> list[str]:
             "",
             _zh_caution(card),
             "",
-            "#### Source Support / 原文证据",
+            "#### 原文证据",
             "",
         ]
     )
@@ -306,18 +374,18 @@ def _zh_card(card: RiskCard, term_style: str) -> list[str]:
     lines = [
         f"### {card.card_id} - {_domain_title(card, term_style)}",
         "",
-        f"> [!{_callout(card.priority)}] {card.priority} / {card.reading_decision}",
-        f"> Domain: `{card.risk_domain}`",
-        f"> Owners: {', '.join(_owner(owner) for owner in card.owners)}",
-        f"> Confidence: {card.confidence:.2f}",
-        f"> Evidence quality: `{card.evidence_quality}`",
-        f"> Review posture: `{card.recommended_review_posture}`",
+        f"> [!{_callout(card.priority)}] 优先级：{_priority(card.priority)} / 阅读动作：{_reading_decision(card.reading_decision)}",
+        f"> 风险域：`{card.risk_domain}`",
+        f"> 主要确认方：{', '.join(_owner(owner) for owner in card.owners)}",
+        f"> 置信度：{card.confidence:.2f}",
+        f"> 证据质量：`{card.evidence_quality}`",
+        f"> 阅读位置：{_posture(card.recommended_review_posture)}",
         "",
-        "#### 这和普通财务分析的差异",
+        "#### 普通财务分析可能会怎么误读",
         "",
         _zh_domain_difference(card),
         "",
-        "#### Finance Reader 应如何理解",
+        "#### 金融读者应如何理解",
         "",
         _zh_domain_read(card),
         "",
@@ -325,33 +393,34 @@ def _zh_card(card: RiskCard, term_style: str) -> list[str]:
         "",
         *([f"- {fact}" for fact in card.issuer_specific_facts] or ["- 未抽取到简洁的 issuer-specific facts。"]),
         "",
-        "#### Legal / Regulatory / Audit / Governance Relevance",
+        "#### 本报告补充的法律 / 披露校准",
         "",
         _zh_verification(card),
         "",
-        "#### Financial Statement Linkage / 财报科目连接",
+        "#### 财报科目连接",
         "",
         *[f"- {item}" for item in card.financial_statement_linkage],
         "",
-        "#### Questions To Ask / 应问问题",
+        "#### 需要确认的问题",
         "",
     ]
     for role, questions in card.questions.items():
-        lines.extend([f"> [!question] {_owner(role.replace('Ask ', ''))}"])
+        clean_role = role.replace("Ask ", "")
+        lines.extend([f"> [!question] 问 {_owner(clean_role)}"])
         for question in questions:
-            lines.append(f"> - 应核查 / Please verify: {question}")
+            lines.append(f"> - {_zh_question(card, clean_role, question)}")
         lines.append("")
     lines.extend(
         [
-            "#### Suggested Management Follow-Up / 管理层跟进",
+            "#### 管理层跟进",
             "",
-            f"需要确认 / Confirm: {card.suggested_management_follow_up}",
+            f"需确认：{card.suggested_management_follow_up}",
             "",
-            "#### What Not To Overstate / 不宜过度表述",
+            "#### 不宜过度表述",
             "",
             _zh_caution(card),
             "",
-            "#### Source Excerpts / 原文摘录",
+            "#### 原文证据",
             "",
         ]
     )
@@ -369,16 +438,16 @@ def _zh_card(card: RiskCard, term_style: str) -> list[str]:
 def _zh_coverage_table(report: RiskCardReport) -> list[str]:
     coverage = report.coverage_summary
     return [
-        "## Coverage Summary / 覆盖情况",
+        "## 覆盖情况",
         "",
-        "| Routing bucket | Count |",
+        "| 分类 | 数量 |",
         "| --- | ---: |",
-        f"| Total paragraphs | {coverage.paragraphs_total} |",
-        f"| Filing admin skipped | {coverage.paragraphs_skipped_admin} |",
-        f"| Ordinary financial KPI routed out | {coverage.financial_kpi_routed_out} |",
-        f"| Business update routed out | {coverage.business_update_routed_out} |",
-        f"| Risk-relevant paragraphs | {coverage.risk_relevant_paragraphs} |",
-        f"| Risk cards generated | {coverage.risk_cards_generated} |",
+        f"| 总段落 | {coverage.paragraphs_total} |",
+        f"| 已跳过的 filing admin 段落 | {coverage.paragraphs_skipped_admin} |",
+        f"| 已排除的普通财务 KPI 段落 | {coverage.financial_kpi_routed_out} |",
+        f"| 已排除的普通业务更新段落 | {coverage.business_update_routed_out} |",
+        f"| 风险相关段落 | {coverage.risk_relevant_paragraphs} |",
+        f"| 已生成风险卡 | {coverage.risk_cards_generated} |",
         "",
     ]
 
@@ -394,7 +463,7 @@ def _zh_cross_risk_connections(cards: list[RiskCard]) -> list[str]:
     if {"cybersecurity_governance", "legal_proceedings_litigation"}.issubset(domains):
         connections.append("Cybersecurity governance 应与 legal proceedings / incident disclosure 口径分开核查，避免把流程披露写成事件结论。")
     if not connections:
-        connections.append("规则未识别出强 cross-risk pattern；仍建议人工复核 read-first 卡片之间的事实连接。")
+        connections.append("规则未识别出强 cross-risk pattern；仍建议人工复核优先阅读卡片之间的事实连接。")
     lines.extend([f"- {item}" for item in connections])
     lines.append("")
     return lines
@@ -410,10 +479,10 @@ def _zh_management_checklist(report: RiskCardReport, term_style: str) -> list[st
 
     lines = ["## 管理层跟进清单", ""]
     if not by_owner:
-        return lines + ["未生成 read-first 管理层跟进事项。", ""]
+        return lines + ["未生成优先阅读管理层跟进事项。", ""]
     for owner, items in sorted(by_owner.items()):
         lines.extend([f"### {owner}", ""])
-        lines.extend([f"- 需要确认 / Confirm: {item}" for item in items[:6]])
+        lines.extend([f"- 需确认：{item}" for item in items[:6]])
         lines.append("")
     return lines
 
@@ -421,11 +490,11 @@ def _zh_management_checklist(report: RiskCardReport, term_style: str) -> list[st
 def _zh_appendix_notes(cards: list[RiskCard], term_style: str) -> list[str]:
     lines = ["## 附录级或低置信卡片", ""]
     if not cards:
-        return lines + ["未生成 appendix-level 卡片。", ""]
+        return lines + ["未生成附录级卡片。", ""]
     for card in cards:
         lines.append(
-            f"- {card.card_id} {_domain_title(card, term_style)}: `{card.priority}`, evidence `{card.evidence_quality}`. "
-            f"这张卡目前不作为 read-first 主线；需要时可回看原文证据。"
+            f"- {card.card_id} {_domain_title(card, term_style)}：`{_priority(card.priority)}`，证据 `{card.evidence_quality}`。"
+            f"这张卡目前不作为优先阅读主线；需要时可回看原文证据。"
         )
     lines.append("")
     return lines
@@ -444,8 +513,16 @@ def _owner(owner: str) -> str:
 
 def _posture(posture: str) -> str:
     if posture == "read-first":
-        return "优先阅读 / read-first"
-    return "附录 / appendix"
+        return "优先阅读"
+    return "附录级 / 较低优先级"
+
+
+def _priority(priority: str) -> str:
+    return PRIORITY_LABELS.get(priority, priority)
+
+
+def _reading_decision(decision: str) -> str:
+    return READING_DECISION_LABELS.get(decision, decision)
 
 
 def _zh_domain_difference(card: RiskCard) -> str:
@@ -485,9 +562,17 @@ def _zh_caution(card: RiskCard) -> str:
 def _first_questions(card: RiskCard) -> list[str]:
     result: list[str] = []
     for role, questions in card.questions.items():
+        clean_role = role.replace("Ask ", "")
         for question in questions[:1]:
-            result.append(f"{_owner(role.replace('Ask ', ''))}: {question}")
+            result.append(f"问 {_owner(clean_role)}：{_zh_question(card, clean_role, question)}")
     return result[:5]
+
+
+def _zh_question(card: RiskCard, owner: str, fallback: str) -> str:
+    questions = ZH_QUESTIONS.get(card.risk_domain, {}).get(owner)
+    if questions:
+        return questions[0]
+    return f"围绕 `{card.risk_domain}` 的事实、会计影响、披露口径和后续责任人进行确认。"
 
 
 def _frontmatter(report: RiskCardReport, title_prefix: str, note_type: str) -> list[str]:
@@ -498,12 +583,15 @@ def _frontmatter(report: RiskCardReport, title_prefix: str, note_type: str) -> l
         "  - sec-filing",
         "  - legal-risk",
         "  - zh-CN",
-        "  - sec-filing-legal-decoder/v0.3.1",
+        "  - sec-filing-legal-decoder/v0.4.0",
         f"note_type: {note_type}",
         f'form_type: "{_yaml_escape(report.document.form_type)}"',
         f'document_mode: "{_yaml_escape(report.document.mode)}"',
         f'source_path: "{_yaml_escape(report.document.source_path)}"',
         f"risk_cards: {len(report.risk_cards)}",
+        f"review_mode: {report.review_mode}",
+        f"external_enrichment: {str(report.external_enrichment).lower()}",
+        f"issuer_profile: {report.issuer_profile}",
         "---",
         "",
     ]

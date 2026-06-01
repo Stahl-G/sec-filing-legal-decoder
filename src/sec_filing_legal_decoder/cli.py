@@ -6,6 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from sec_filing_legal_decoder import __version__
 from sec_filing_legal_decoder.crosswalk import analyze_document
 from sec_filing_legal_decoder.obsidian import RiskCardObsidianOptions, export_risk_cards_to_obsidian
 from sec_filing_legal_decoder.overlay import build_overlay_report
@@ -32,6 +33,11 @@ def build_parser() -> argparse.ArgumentParser:
         prog="sec-filing-legal-decoder",
         description="Decode legal-heavy SEC filing sections into finance-readable notes.",
     )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"sec-filing-legal-decoder {__version__}",
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     analyze = subparsers.add_parser("analyze", help="Analyze SEC HTML, Markdown, TXT, or MinerU-parsed input.")
@@ -46,7 +52,7 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--obsidian-vault", type=Path, help="Obsidian vault root path.")
     analyze.add_argument(
         "--obsidian-folder",
-        help="Relative folder inside the Obsidian vault, such as 'SEC Filings/TSLA/2025 10-K'.",
+        help="Relative folder inside the Obsidian vault, such as 'SEC Filings/SAMPLE/2025 20-F'.",
     )
     analyze.add_argument("--company", help="Company name for Obsidian frontmatter.")
     analyze.add_argument("--ticker", help="Ticker for Obsidian frontmatter.")
@@ -64,7 +70,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     risk_cards = subparsers.add_parser(
         "risk-cards",
-        help="Generate v0.3 legal risk cards and integrated legal risk review for finance readers.",
+        help="Generate source-only legal risk cards and integrated legal risk review for finance readers.",
     )
     risk_cards.add_argument("input", type=Path, help="Input SEC HTML/Markdown/TXT/PDF/Office path.")
     risk_cards.add_argument(
@@ -83,7 +89,26 @@ def build_parser() -> argparse.ArgumentParser:
     risk_cards.add_argument("--questions-out", type=Path, help="Escalation questions Markdown output path.")
     risk_cards.add_argument("--management-follow-up-out", type=Path, help="Management follow-up Markdown output path.")
     risk_cards.add_argument("--evidence-audit-out", type=Path, help="Evidence audit Markdown output path.")
-    risk_cards.add_argument("--obsidian-dir", type=Path, help="Obsidian folder for v0.3 risk-card notes.")
+    risk_cards.add_argument("--obsidian-dir", type=Path, help="Obsidian folder for v0.4 risk-card notes.")
+    risk_cards.add_argument(
+        "--review-mode",
+        choices=["source-only"],
+        default="source-only",
+        help="Review mode. v0.4 supports source-only filing review.",
+    )
+    risk_cards.add_argument(
+        "--issuer-profile",
+        choices=[
+            "general",
+            "small-issuer",
+            "foreign-private-issuer",
+            "spac-de-spac",
+            "manufacturing",
+            "solar-manufacturing",
+        ],
+        default="general",
+        help="Issuer profile used to calibrate priority without creating unsupported cards.",
+    )
     risk_cards.add_argument(
         "--lang",
         choices=["en", "zh-CN"],
@@ -156,6 +181,8 @@ def main(argv: list[str] | None = None) -> int:
                 args.management_follow_up_out,
                 args.evidence_audit_out,
                 args.obsidian_dir,
+                args.review_mode,
+                args.issuer_profile,
                 args.lang,
                 args.term_style,
                 args.company,
@@ -253,6 +280,8 @@ def _risk_cards(
     management_follow_up_out: Path | None,
     evidence_audit_out: Path | None,
     obsidian_dir: Path | None,
+    review_mode: str,
+    issuer_profile: str,
     lang: str,
     term_style: str,
     company: str | None,
@@ -262,7 +291,11 @@ def _risk_cards(
 ) -> int:
     backend = choose_backend(parser_name, input_path)
     document = backend.parse(input_path)
-    report = generate_risk_card_report(document)
+    report = generate_risk_card_report(
+        document,
+        review_mode=review_mode,
+        issuer_profile=issuer_profile,
+    )
 
     review_markdown = render_integrated_legal_risk_review(report, lang=lang, term_style=term_style)
     markdown = render_legal_risk_cards_report(report, lang=lang, term_style=term_style)
@@ -270,7 +303,7 @@ def _risk_cards(
         _write_text(output_dir / "legal-risk-review.md", review_markdown)
         _write_text(output_dir / "legal-risk-cards.md", markdown)
         _write_text(output_dir / "legal-risk-cards.json", render_risk_cards_json_report(report))
-        _write_text(output_dir / "evidence-audit.md", render_evidence_audit_report(report))
+        _write_text(output_dir / "evidence-audit.md", render_evidence_audit_report(report, lang=lang))
         _write_text(output_dir / "escalation-questions.md", render_escalation_questions_report(report, lang=lang, term_style=term_style))
         _write_text(
             output_dir / "management-follow-up.md",
@@ -288,7 +321,7 @@ def _risk_cards(
     if management_follow_up_out is not None:
         _write_text(management_follow_up_out, render_management_follow_up_report(report, lang=lang, term_style=term_style))
     if evidence_audit_out is not None:
-        _write_text(evidence_audit_out, render_evidence_audit_report(report))
+        _write_text(evidence_audit_out, render_evidence_audit_report(report, lang=lang))
     if obsidian_dir is not None:
         export_risk_cards_to_obsidian(
             report,

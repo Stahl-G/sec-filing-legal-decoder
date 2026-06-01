@@ -23,7 +23,7 @@ OVERLY_CERTAIN_PATTERNS: tuple[str, ...] = (
 
 
 def build_overlay_report(document: ParsedDocument, analysis_path: Path) -> OverlayReport:
-    """Build an overlay report using v0.3 risk cards as the review spine."""
+    """Build an overlay report using v0.4 risk cards as the review spine."""
 
     risk_report = generate_risk_card_report(document)
     analysis_text = read_analysis(analysis_path)

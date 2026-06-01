@@ -1,4 +1,4 @@
-"""Markdown rendering for v0.3 escalation questions."""
+"""Markdown rendering for v0.4 escalation questions."""
 
 from __future__ import annotations
 

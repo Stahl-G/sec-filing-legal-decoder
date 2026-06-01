@@ -1,0 +1,12 @@
+[
+  {
+    "name": "ordinary_finance_kpi_routes_out",
+    "text": "Revenue increased 12% and gross margin improved due to higher shipment volume.",
+    "expected_card_count": 0
+  },
+  {
+    "name": "source_only_no_external_claim",
+    "text": "The company is involved in legal proceedings where a loss is reasonably possible but cannot be estimated.",
+    "forbidden_terms": ["media reports", "outside counsel said", "analyst consensus", "external database"]
+  }
+]

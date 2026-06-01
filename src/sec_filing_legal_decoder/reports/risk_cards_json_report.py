@@ -1,4 +1,4 @@
-"""JSON rendering for v0.3 risk-card reports."""
+"""JSON rendering for v0.4 risk-card reports."""
 
 from __future__ import annotations
 

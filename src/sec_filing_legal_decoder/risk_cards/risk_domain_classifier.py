@@ -1,4 +1,4 @@
-"""Rule-based risk-domain taxonomy for v0.3 risk cards."""
+"""Rule-based risk-domain taxonomy for v0.4 risk cards."""
 
 from __future__ import annotations
 
@@ -18,6 +18,10 @@ RISK_DOMAIN_PATTERNS: dict[str, tuple[str, ...]] = {
         r"\bicfr\b",
         r"\bsox\b|\bsarbanes[- ]oxley\b",
         r"disclosure controls? and procedures",
+        r"auditor attestation",
+        r"attestation exemption",
+        r"late filing",
+        r"restatement",
         r"controls? .* ineffective",
         r"remediation plan",
         r"significant deficiency",
@@ -79,6 +83,12 @@ RISK_DOMAIN_PATTERNS: dict[str, tuple[str, ...]] = {
         r"guaranty",
         r"commitment",
         r"purchase obligation",
+        r"capacity commitment",
+        r"factory ramp",
+        r"customer concentration",
+        r"supplier concentration",
+        r"product liability",
+        r"warranty exposure",
         r"minimum purchase",
         r"off[- ]balance",
         r"standby letter of credit",
@@ -91,6 +101,10 @@ RISK_DOMAIN_PATTERNS: dict[str, tuple[str, ...]] = {
         r"\bwarrants?\b",
         r"convertible notes?",
         r"earnout",
+        r"sponsor arrangements?",
+        r"registration rights?",
+        r"redemption history",
+        r"lock[- ]up",
         r"\bpipe\b",
         r"voting rights?",
         r"founder control",
@@ -106,6 +120,8 @@ RISK_DOMAIN_PATTERNS: dict[str, tuple[str, ...]] = {
         r"cross[- ]border",
         r"uncertain tax",
         r"tax audit",
+        r"offshore holding",
+        r"remittance restrictions?",
         r"foreign exchange control",
         r"\bvat\b",
     ),
@@ -119,6 +135,10 @@ RISK_DOMAIN_PATTERNS: dict[str, tuple[str, ...]] = {
         r"transition",
         r"corporate governance",
         r"independent directors?",
+        r"foreign private issuer",
+        r"\bfpi\b",
+        r"home[- ]country governance",
+        r"home country practice",
     ),
     "disclosure_ir_consistency": (
         r"safe harbor",

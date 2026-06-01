@@ -1,4 +1,4 @@
-"""Route filing paragraphs before generating v0.3 risk cards."""
+"""Route filing paragraphs before generating v0.4 risk cards."""
 
 from __future__ import annotations
 
@@ -67,7 +67,7 @@ def route_paragraph(
                 text=paragraph,
                 content_type="business_update",
                 route_action="route_out",
-                reason="earnings-release paragraph without a v0.3 legal-risk domain",
+                reason="earnings-release paragraph without a v0.4 legal-risk domain",
                 risk_domains=[],
             )
         if (
@@ -123,7 +123,7 @@ def route_paragraph(
         text=paragraph,
         content_type="background",
         route_action="route_out",
-        reason="no v0.3 legal-risk domain terms detected",
+        reason="no v0.4 legal-risk domain terms detected",
         risk_domains=[],
     )
 

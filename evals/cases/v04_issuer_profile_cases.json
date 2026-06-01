@@ -1,0 +1,26 @@
+[
+  {
+    "name": "small_issuer_going_concern",
+    "profile": "small-issuer",
+    "text": "The auditor expressed substantial doubt about the company's ability to continue as a going concern.",
+    "expected_domain": "audit_going_concern",
+    "expected_priority": "Critical",
+    "expected_posture": "read-first"
+  },
+  {
+    "name": "spac_equity_stack",
+    "profile": "spac-de-spac",
+    "text": "Sponsor arrangements, PIPE financing, public warrants, earnout shares, redemption history, registration rights, and lock-up agreements may dilute shareholders.",
+    "expected_domain": "equity_dilution_control",
+    "expected_priority": "High",
+    "expected_posture": "read-first"
+  },
+  {
+    "name": "manufacturing_capacity_commitments",
+    "profile": "manufacturing",
+    "text": "The company entered into capacity commitments, purchase obligations, customer concentration terms, supplier concentration terms, and factory ramp commitments.",
+    "expected_domain": "guarantees_commitments",
+    "expected_priority": "High",
+    "expected_posture": "read-first"
+  }
+]

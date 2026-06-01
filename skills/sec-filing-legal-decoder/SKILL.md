@@ -7,8 +7,9 @@ documents.
 ## What To Do
 
 1. Prefer the EDGAR main `.htm/.html` filing document when available.
-2. Use `sec-filing-legal-decoder risk-cards` for the preferred v0.3.1 workflow:
-   an integrated `legal-risk-review.md` plus issue-level legal risk cards.
+2. Use `sec-filing-legal-decoder risk-cards` for the preferred v0.4.0
+   source-only workflow: an integrated `legal-risk-review.md` plus issue-level
+   legal risk cards.
 3. Use `sec-filing-legal-decoder review-overlay` when the user has an existing
    finance or earnings analysis and wants legal/governance/disclosure gaps.
 4. Use `sec-filing-legal-decoder analyze` only when the user specifically wants
@@ -38,11 +39,15 @@ documents.
   available.
 - Do not include confidential company documents, credentials, raw logs, or
   material non-public information in this repository.
+- Do not add web, news, analyst, law-firm, market-data, or database enrichment
+  to a v0.4.0 source-only review.
 
 ## First Command
 
 ```bash
 sec-filing-legal-decoder risk-cards examples/synthetic_sec_inline_xbrl.htm \
+  --review-mode source-only \
+  --issuer-profile general \
   --output-dir outputs/sample-risk-cards
 ```
 
@@ -50,6 +55,8 @@ For Chinese bilingual output:
 
 ```bash
 sec-filing-legal-decoder risk-cards examples/synthetic_sec_inline_xbrl.htm \
+  --review-mode source-only \
+  --issuer-profile general \
   --output-dir outputs/sample-risk-cards-zh \
   --lang zh-CN
 ```
@@ -62,10 +69,12 @@ Obsidian folder.
 
 ```bash
 sec-filing-legal-decoder risk-cards input.htm \
+  --review-mode source-only \
+  --issuer-profile general \
   --output-dir outputs/company-risk-cards \
-  --obsidian-dir ~/Documents/ObsidianVault/SEC\ Filings/COMPANY/2025\ 10-K \
-  --company "Company Name" \
-  --ticker TICKER \
-  --form 10-K \
+  --obsidian-dir ~/Documents/ObsidianVault/SEC\ Filings/SAMPLE/2025\ 20-F \
+  --company "Sample Foreign Issuer" \
+  --ticker SAMPLE \
+  --form 20-F \
   --year 2025
 ```

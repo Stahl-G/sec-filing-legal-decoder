@@ -68,7 +68,7 @@ class ReviewReport:
 
 @dataclass(frozen=True)
 class DocumentInfo:
-    """Document identity and filing mode for v0.3 risk-card reports."""
+    """Document identity and filing mode for v0.4 risk-card reports."""
 
     title: str
     form_type: str
@@ -135,7 +135,7 @@ class RiskCard:
 
 @dataclass(frozen=True)
 class RiskCardReport:
-    """Document-level v0.3 report centered on risk cards."""
+    """Document-level v0.4 report centered on risk cards."""
 
     document: DocumentInfo
     coverage_summary: CoverageSummary
@@ -143,6 +143,9 @@ class RiskCardReport:
     escalation_matrix: list[dict[str, Any]]
     management_follow_up: list[str]
     disclosure_consistency_questions: list[str]
+    review_mode: str = "source-only"
+    external_enrichment: bool = False
+    issuer_profile: str = "general"
     disclaimer: str = DISCLAIMER
 
     def to_dict(self) -> dict[str, Any]:

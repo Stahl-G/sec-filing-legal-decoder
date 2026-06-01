@@ -9,5 +9,11 @@ venv/
 dist/
 build/
 outputs/
+private_outputs/
+local_filings/
+private_filings/
+*.local.md
+*.local.json
+sensitive_terms.txt
 *.log
 .DS_Store

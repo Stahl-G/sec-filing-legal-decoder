@@ -1,4 +1,4 @@
-"""Markdown rendering for v0.3 legal risk cards."""
+"""Markdown rendering for v0.4 legal risk cards."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ def render_legal_risk_cards_report(
     lang: str = "en",
     term_style: str = "bilingual",
 ) -> str:
-    """Render the main v0.3 Markdown report in Obsidian-friendly format."""
+    """Render the main v0.4 Markdown report in Obsidian-friendly format."""
 
     if lang == "zh-CN":
         from .zh_cn_reports import render_legal_risk_cards_report_zh_cn
@@ -23,7 +23,7 @@ def render_legal_risk_cards_report(
         *_frontmatter(report),
         f"# Legal Risk Cards: {report.document.title}",
         "",
-        "> [!summary] v0.3 Scope",
+        "> [!summary] v0.4 Source-Only Scope",
         "> This report does not summarize ordinary revenue, margin, EPS, valuation, or peer-comparison topics.",
         "> It converts legal, regulatory, governance, audit, disclosure, debt, related-party, dilution, and material-contract language into finance-readable risk cards.",
         "",
@@ -50,11 +50,14 @@ def _frontmatter(report: RiskCardReport) -> list[str]:
         "tags:",
         "  - sec-filing",
         "  - legal-risk",
-        "  - sec-filing-legal-decoder/v0.3.1",
+        "  - sec-filing-legal-decoder/v0.4.0",
         f'form_type: "{_yaml_escape(report.document.form_type)}"',
         f'document_mode: "{_yaml_escape(report.document.mode)}"',
         f'source_path: "{_yaml_escape(report.document.source_path)}"',
         f"risk_cards: {len(report.risk_cards)}",
+        f"review_mode: {report.review_mode}",
+        f"external_enrichment: {str(report.external_enrichment).lower()}",
+        f"issuer_profile: {report.issuer_profile}",
         "---",
         "",
     ]

@@ -27,6 +27,7 @@ from .materiality_rules import (
     reading_decision_for,
 )
 from .question_bank import QUESTION_BANK
+from .issuer_profiles import DEFAULT_ISSUER_PROFILE, apply_issuer_profile
 from .risk_domain_classifier import detect_subdomains
 
 
@@ -79,13 +80,19 @@ class CardCandidate:
     priority: str
 
 
-def generate_risk_card_report(document: ParsedDocument) -> RiskCardReport:
-    """Generate a v0.3 risk-card report from a parsed document."""
+def generate_risk_card_report(
+    document: ParsedDocument,
+    review_mode: str = "source-only",
+    issuer_profile: str = DEFAULT_ISSUER_PROFILE,
+) -> RiskCardReport:
+    """Generate a v0.4 source-only risk-card report from a parsed document."""
 
+    if review_mode != "source-only":
+        raise ValueError("v0.4.0 only supports --review-mode source-only.")
     form_type, mode = detect_document_mode(document)
     paragraphs = split_paragraphs(document.content)
     routes = route_paragraphs(paragraphs, document.source_path, mode)
-    cards = _generate_cards(routes)
+    cards = _generate_cards(routes, issuer_profile)
     coverage = _coverage_summary(routes, cards)
     doc_info = DocumentInfo(
         title=document.title or "Untitled Filing Review",
@@ -102,10 +109,13 @@ def generate_risk_card_report(document: ParsedDocument) -> RiskCardReport:
         escalation_matrix=_escalation_matrix(cards),
         management_follow_up=_management_follow_up(cards),
         disclosure_consistency_questions=_disclosure_consistency_questions(cards),
+        review_mode=review_mode,
+        external_enrichment=False,
+        issuer_profile=issuer_profile,
     )
 
 
-def _generate_cards(routes: list[ParagraphRoute]) -> list[RiskCard]:
+def _generate_cards(routes: list[ParagraphRoute], issuer_profile: str) -> list[RiskCard]:
     grouped: dict[str, list[ParagraphRoute]] = defaultdict(list)
     for route in routes:
         if route.route_action != "analyze":
@@ -120,6 +130,7 @@ def _generate_cards(routes: list[ParagraphRoute]) -> list[RiskCard]:
             continue
         text = " ".join(item.route.text for item in accepted)
         priority = priority_for(domain, text, len(accepted))
+        priority = apply_issuer_profile(issuer_profile, domain, text, priority)
         candidates.append(CardCandidate(domain, accepted, suppressed, priority))
     candidates = _consolidate_candidates(candidates)
     candidates.sort(
@@ -140,6 +151,7 @@ def _generate_cards(routes: list[ParagraphRoute]) -> list[RiskCard]:
                 candidate.accepted,
                 candidate.suppressed,
                 candidate.priority,
+                issuer_profile,
             )
         )
     return cards
@@ -320,6 +332,7 @@ def _build_card(
     accepted: list[EvidenceRoute],
     suppressed: list[EvidenceRoute],
     priority: str,
+    issuer_profile: str,
 ) -> RiskCard:
     routes = [item.route for item in accepted]
     text = " ".join(route.text for route in routes)
@@ -381,7 +394,7 @@ def _build_card(
         evidence_quality=evidence_quality,
         evidence_summary=evidence_summary,
         weak_or_suppressed_sources=suppressed_excerpts,
-        recommended_review_posture=_review_posture(domain, priority, evidence_quality, facts),
+        recommended_review_posture=_review_posture(domain, priority, evidence_quality, facts, issuer_profile),
     )
 
 
@@ -601,11 +614,23 @@ def _financial_analysis_difference(domain: str, title: str, facts: list[str]) ->
     return base
 
 
-def _review_posture(domain: str, priority: str, evidence_quality: str, facts: list[str]) -> str:
+def _review_posture(
+    domain: str,
+    priority: str,
+    evidence_quality: str,
+    facts: list[str],
+    issuer_profile: str = DEFAULT_ISSUER_PROFILE,
+) -> str:
     if domain == "disclosure_ir_consistency":
         return "appendix"
     if domain == "management_board_governance" and priority != "High":
         return "appendix"
+    if issuer_profile in {"small-issuer", "spac-de-spac"} and domain == "equity_dilution_control" and priority == "High":
+        return "read-first"
+    if issuer_profile == "foreign-private-issuer" and domain == "management_board_governance" and priority == "High":
+        return "read-first"
+    if domain in READ_FIRST_DOMAINS and priority == "Critical":
+        return "read-first"
     if domain in READ_FIRST_DOMAINS and priority in {"Critical", "High"} and evidence_quality in {"high", "medium"}:
         return "read-first"
     if domain in READ_FIRST_DOMAINS and evidence_quality == "high" and facts:

@@ -43,7 +43,7 @@ def test_legal_risk_cards_report_contains_cards_and_scope():
     payload = render_risk_cards_json_report(report)
 
     assert markdown.startswith("---\n")
-    assert "v0.3 Scope" in markdown
+    assert "v0.4 Source-Only Scope" in markdown
     assert "## Risk Cards" in markdown
     assert "## Executive Takeaway" in review
     assert "## Evidence Audit" in audit or "# Evidence Audit" in audit

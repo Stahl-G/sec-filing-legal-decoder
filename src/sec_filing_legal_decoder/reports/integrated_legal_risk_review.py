@@ -12,7 +12,7 @@ def render_integrated_legal_risk_review(
     lang: str = "en",
     term_style: str = "bilingual",
 ) -> str:
-    """Render the first-read narrative report for v0.3.0+ workflows."""
+    """Render the first-read narrative report for v0.4.0+ workflows."""
 
     if lang == "zh-CN":
         from .zh_cn_reports import render_integrated_legal_risk_review_zh_cn
@@ -50,11 +50,14 @@ def _frontmatter(report: RiskCardReport) -> list[str]:
         "  - sec-filing",
         "  - legal-risk",
         "  - integrated-review",
-        "  - sec-filing-legal-decoder/v0.3.1",
+        "  - sec-filing-legal-decoder/v0.4.0",
         f'form_type: "{_yaml_escape(report.document.form_type)}"',
         f'document_mode: "{_yaml_escape(report.document.mode)}"',
         f'source_path: "{_yaml_escape(report.document.source_path)}"',
         f"risk_cards: {len(report.risk_cards)}",
+        f"review_mode: {report.review_mode}",
+        f"external_enrichment: {str(report.external_enrichment).lower()}",
+        f"issuer_profile: {report.issuer_profile}",
         "---",
         "",
     ]

@@ -1,4 +1,4 @@
-"""Markdown rendering for v0.3 management follow-up notes."""
+"""Markdown rendering for v0.4 management follow-up notes."""
 
 from __future__ import annotations
 
