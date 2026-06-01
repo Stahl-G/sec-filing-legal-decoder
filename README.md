@@ -2,7 +2,8 @@
 
 Filling-Crosswalker is an initial open-source Python CLI project for
 `filing-crosswalk`: a workflow layer for reading SEC filings, annual reports,
-and legal-heavy corporate documents.
+and legal-heavy corporate documents, especially SEC-style issuer reports such
+as `20-F`, `10-K`, `10-Q`, and `40-F`.
 
 It focuses on the non-financial filing language that can change financial
 judgment: legal proceedings, regulatory risk, internal control weaknesses,
@@ -12,6 +13,8 @@ and material contracts.
 ## What This Project Is
 
 - A deterministic v0.1 toolkit for legal-to-finance filing triage.
+- Especially useful for legal-heavy sections in `20-F`, `10-K`, `10-Q`, and
+  `40-F` reports.
 - A CLI that reads Markdown/TXT today and can optionally call MinerU for PDF or
   Office parsing.
 - A source of structured crosswalk notes, escalation questions, Markdown
@@ -70,9 +73,10 @@ https://github.com/YihongGuo/Filling-Crosswalker
 
 Clone or open the repository, read README.md and AGENTS.md, install it in a
 local virtual environment, run the built-in smoke test, then analyze my filing
-Markdown/TXT file with filing-crosswalk. Generate a Markdown report, a JSON
-structured report, and, if useful, a management memo. Do not treat the output as
-legal, investment, accounting, or audit advice.
+Markdown/TXT file with filing-crosswalk. This is especially intended for
+20-F, 10-K, 10-Q, and 40-F legal-heavy sections. Generate a Markdown report, a
+JSON structured report, and, if useful, a management memo. Do not treat the
+output as legal, investment, accounting, or audit advice.
 ```
 
 For a first test, ask your agent to run the built-in synthetic example:
@@ -91,6 +95,36 @@ Expected result:
 - Reading decisions such as `SKIM`, `DEEP_READ`, or `ESCALATE`
 - Legal-to-finance notes and role-specific escalation questions
 - A disclaimer reminding you that the output is only a triage aid
+
+## 中文快速开始
+
+这个项目更适合当作一个 **agent skill / agent-readable repository** 使用。
+
+最简单的用法：把本仓库链接和你的 filing 文档交给 Codex、Claude Code、
+OpenCode、Cursor 或其他 coding agent，让 agent 自己读取 `README.md` 和
+`AGENTS.md`，安装依赖，运行 smoke test，然后生成报告。
+
+可以直接复制下面这段给你的 agent：
+
+```text
+请使用这个项目：
+https://github.com/YihongGuo/Filling-Crosswalker
+
+请 clone 或打开这个仓库，阅读 README.md 和 AGENTS.md，在本地虚拟环境中安装
+项目，先运行内置 smoke test，然后用 filing-crosswalk 分析我的 filing
+Markdown/TXT 文件。这个项目特别适合 20-F、10-K、10-Q、40-F 中法律语言较重的
+章节。请输出 Markdown review report、JSON structured report，并在有必要时生成
+management memo。不要把输出当作法律、投资、会计或审计意见。
+```
+
+第一次试用可以让 agent 先跑内置样例：
+
+```text
+请使用 examples/synthetic_legal_proceedings.md 生成：
+- outputs/report.md
+- outputs/report.json
+然后用中文总结 top flagged paragraphs 和 escalation questions。
+```
 
 ## Manual Developer Setup
 
@@ -112,7 +146,8 @@ python evals/run_evals.py
 
 ## CLI Examples
 
-Analyze Markdown or TXT:
+Analyze Markdown or TXT from a filing, especially `20-F`, `10-K`, `10-Q`, or
+`40-F` content:
 
 ```bash
 filing-crosswalk analyze examples/synthetic_legal_proceedings.md \
