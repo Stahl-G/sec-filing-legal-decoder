@@ -1,4 +1,4 @@
-"""Markdown rendering for v0.2 legal risk cards."""
+"""Markdown rendering for v0.3 legal risk cards."""
 
 from __future__ import annotations
 
@@ -7,14 +7,23 @@ from collections import Counter
 from sec_filing_legal_decoder.schemas import RiskCard, RiskCardReport
 
 
-def render_legal_risk_cards_report(report: RiskCardReport) -> str:
-    """Render the main v0.2 Markdown report in Obsidian-friendly format."""
+def render_legal_risk_cards_report(
+    report: RiskCardReport,
+    lang: str = "en",
+    term_style: str = "bilingual",
+) -> str:
+    """Render the main v0.3 Markdown report in Obsidian-friendly format."""
+
+    if lang == "zh-CN":
+        from .zh_cn_reports import render_legal_risk_cards_report_zh_cn
+
+        return render_legal_risk_cards_report_zh_cn(report, term_style)
 
     lines: list[str] = [
         *_frontmatter(report),
         f"# Legal Risk Cards: {report.document.title}",
         "",
-        "> [!summary] v0.2 Scope",
+        "> [!summary] v0.3 Scope",
         "> This report does not summarize ordinary revenue, margin, EPS, valuation, or peer-comparison topics.",
         "> It converts legal, regulatory, governance, audit, disclosure, debt, related-party, dilution, and material-contract language into finance-readable risk cards.",
         "",
@@ -41,7 +50,7 @@ def _frontmatter(report: RiskCardReport) -> list[str]:
         "tags:",
         "  - sec-filing",
         "  - legal-risk",
-        "  - sec-filing-legal-decoder/v0.2",
+        "  - sec-filing-legal-decoder/v0.3.0",
         f'form_type: "{_yaml_escape(report.document.form_type)}"',
         f'document_mode: "{_yaml_escape(report.document.mode)}"',
         f'source_path: "{_yaml_escape(report.document.source_path)}"',
@@ -117,6 +126,10 @@ def _card(card: RiskCard) -> list[str]:
         "#### Finance-Reader Implication",
         "",
         card.finance_reader_implication or card.why_finance_readers_should_care,
+        "",
+        "#### How This Differs From Ordinary Financial Analysis",
+        "",
+        card.financial_analysis_difference,
         "",
         "#### What The Filing Says",
         "",

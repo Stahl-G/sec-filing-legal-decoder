@@ -75,6 +75,11 @@ def priority_for(domain: str, text: str, paragraph_count: int) -> str:
         r"\$[\d,.]+\s*(?:million|billion)", text, flags=re.IGNORECASE
     ):
         priority = _max_priority(priority, "High")
+    if domain == "tax_cross_border" and re.search(
+        r"valuation allowance|deferred tax assets?|uncertain tax|tax benefit|more[- ]likely[- ]than[- ]not",
+        lowered,
+    ):
+        priority = _max_priority(priority, "High")
     if domain == "disclosure_ir_consistency" and not _has_any(lowered, ESCALATION_TERMS):
         priority = _max_priority("Low", priority)
     if paragraph_count >= 4:

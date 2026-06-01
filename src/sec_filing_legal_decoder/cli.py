@@ -64,7 +64,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     risk_cards = subparsers.add_parser(
         "risk-cards",
-        help="Generate v0.2 legal risk cards for finance readers.",
+        help="Generate v0.3 legal risk cards and integrated legal risk review for finance readers.",
     )
     risk_cards.add_argument("input", type=Path, help="Input SEC HTML/Markdown/TXT/PDF/Office path.")
     risk_cards.add_argument(
@@ -83,7 +83,19 @@ def build_parser() -> argparse.ArgumentParser:
     risk_cards.add_argument("--questions-out", type=Path, help="Escalation questions Markdown output path.")
     risk_cards.add_argument("--management-follow-up-out", type=Path, help="Management follow-up Markdown output path.")
     risk_cards.add_argument("--evidence-audit-out", type=Path, help="Evidence audit Markdown output path.")
-    risk_cards.add_argument("--obsidian-dir", type=Path, help="Obsidian folder for v0.2 risk-card notes.")
+    risk_cards.add_argument("--obsidian-dir", type=Path, help="Obsidian folder for v0.3 risk-card notes.")
+    risk_cards.add_argument(
+        "--lang",
+        choices=["en", "zh-CN"],
+        default="en",
+        help="Markdown report language: en or zh-CN.",
+    )
+    risk_cards.add_argument(
+        "--term-style",
+        choices=["english", "bilingual", "translated"],
+        default="bilingual",
+        help="Term style for non-English reports.",
+    )
     risk_cards.add_argument("--company", help="Company name for Obsidian frontmatter.")
     risk_cards.add_argument("--ticker", help="Ticker for Obsidian frontmatter.")
     risk_cards.add_argument("--form", help="Form type for Obsidian frontmatter, such as 10-K or 20-F.")
@@ -144,6 +156,8 @@ def main(argv: list[str] | None = None) -> int:
                 args.management_follow_up_out,
                 args.evidence_audit_out,
                 args.obsidian_dir,
+                args.lang,
+                args.term_style,
                 args.company,
                 args.ticker,
                 args.form,
@@ -239,6 +253,8 @@ def _risk_cards(
     management_follow_up_out: Path | None,
     evidence_audit_out: Path | None,
     obsidian_dir: Path | None,
+    lang: str,
+    term_style: str,
     company: str | None,
     ticker: str | None,
     form: str | None,
@@ -248,15 +264,18 @@ def _risk_cards(
     document = backend.parse(input_path)
     report = generate_risk_card_report(document)
 
-    review_markdown = render_integrated_legal_risk_review(report)
-    markdown = render_legal_risk_cards_report(report)
+    review_markdown = render_integrated_legal_risk_review(report, lang=lang, term_style=term_style)
+    markdown = render_legal_risk_cards_report(report, lang=lang, term_style=term_style)
     if output_dir is not None:
         _write_text(output_dir / "legal-risk-review.md", review_markdown)
         _write_text(output_dir / "legal-risk-cards.md", markdown)
         _write_text(output_dir / "legal-risk-cards.json", render_risk_cards_json_report(report))
         _write_text(output_dir / "evidence-audit.md", render_evidence_audit_report(report))
-        _write_text(output_dir / "escalation-questions.md", render_escalation_questions_report(report))
-        _write_text(output_dir / "management-follow-up.md", render_management_follow_up_report(report))
+        _write_text(output_dir / "escalation-questions.md", render_escalation_questions_report(report, lang=lang, term_style=term_style))
+        _write_text(
+            output_dir / "management-follow-up.md",
+            render_management_follow_up_report(report, lang=lang, term_style=term_style),
+        )
 
     if review_out is not None:
         _write_text(review_out, review_markdown)
@@ -265,9 +284,9 @@ def _risk_cards(
     if json_out is not None:
         _write_text(json_out, render_risk_cards_json_report(report))
     if questions_out is not None:
-        _write_text(questions_out, render_escalation_questions_report(report))
+        _write_text(questions_out, render_escalation_questions_report(report, lang=lang, term_style=term_style))
     if management_follow_up_out is not None:
-        _write_text(management_follow_up_out, render_management_follow_up_report(report))
+        _write_text(management_follow_up_out, render_management_follow_up_report(report, lang=lang, term_style=term_style))
     if evidence_audit_out is not None:
         _write_text(evidence_audit_out, render_evidence_audit_report(report))
     if obsidian_dir is not None:
@@ -275,6 +294,8 @@ def _risk_cards(
             report,
             RiskCardObsidianOptions(
                 output_dir=obsidian_dir,
+                lang=lang,
+                term_style=term_style,
                 company=company,
                 ticker=ticker,
                 form=form,

@@ -1,4 +1,4 @@
-"""Markdown rendering for v0.2 review-overlay reports."""
+"""Markdown rendering for v0.3 review-overlay reports."""
 
 from __future__ import annotations
 

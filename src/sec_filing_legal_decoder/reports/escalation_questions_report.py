@@ -1,4 +1,4 @@
-"""Markdown rendering for v0.2 escalation questions."""
+"""Markdown rendering for v0.3 escalation questions."""
 
 from __future__ import annotations
 
@@ -7,8 +7,17 @@ from collections import defaultdict
 from sec_filing_legal_decoder.schemas import RiskCard, RiskCardReport
 
 
-def render_escalation_questions_report(report: RiskCardReport) -> str:
+def render_escalation_questions_report(
+    report: RiskCardReport,
+    lang: str = "en",
+    term_style: str = "bilingual",
+) -> str:
     """Render issue-level escalation questions."""
+
+    if lang == "zh-CN":
+        from .zh_cn_reports import render_escalation_questions_report_zh_cn
+
+        return render_escalation_questions_report_zh_cn(report, term_style)
 
     lines = [
         "---",

@@ -15,6 +15,8 @@ TAXONOMY_PATTERNS: tuple[str, ...] = (
     r"\(polic(?:y|ies)\)$",
     r"^amount of\b",
     r"^aggregate (?:par|total|market|fair) value\b",
+    r"^carrying value as of the balance sheet date\b",
+    r"^maximum borrowing capacity under the credit facility\b",
     r"^boolean flag\b",
     r"^the tax identification number\b",
     r"^a unique \d+[- ]digit sec-issued value\b",
@@ -210,7 +212,6 @@ def assess_evidence(text: str, domain: str) -> EvidenceAssessment:
     posture_can_support_domain = domain in {
         "legal_proceedings_litigation",
         "disclosure_ir_consistency",
-        "debt_liquidity_covenant",
     }
     if not has_domain_support and not (has_disclosure_posture and posture_can_support_domain):
         return EvidenceAssessment(score, "suppressed", notes or ["insufficient_domain_specific_evidence"], False)
@@ -234,6 +235,16 @@ def _domain_false_positive(text: str, domain: str) -> bool:
     if domain == "legal_proceedings_litigation" and "form of settlement in cash" in text:
         return True
     if domain == "debt_liquidity_covenant" and "time to liquidity" in text and "debt" not in text and "default" not in text:
+        return True
+    if domain == "debt_liquidity_covenant" and "lack of liquidity" in text and not re.search(
+        r"\bdebt\b|\bcovenants?\b|\bdefault\b|\bcredit facilit|\bborrowings?\b|\bwaiver\b",
+        text,
+    ):
+        return True
+    if domain == "debt_liquidity_covenant" and "legal proceedings" in text and not re.search(
+        r"\bdebt\b|\bcovenants?\b|\bdefault\b|\bcredit facilit|\bborrowings?\b|\bwaiver\b|\brefinanc",
+        text,
+    ):
         return True
     return False
 

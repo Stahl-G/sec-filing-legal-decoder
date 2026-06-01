@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import defaultdict
 from dataclasses import dataclass
 
@@ -32,6 +33,32 @@ from .risk_domain_classifier import detect_subdomains
 MAX_CARDS = 12
 MAX_EXCERPTS_PER_CARD = 5
 PRIORITY_SORT = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3, "Monitor": 4}
+DOMAIN_SORT = {
+    "audit_going_concern": 0,
+    "legal_proceedings_litigation": 1,
+    "material_contracts": 2,
+    "guarantees_commitments": 3,
+    "tax_cross_border": 4,
+    "cybersecurity_governance": 5,
+    "internal_control_reporting": 6,
+    "regulatory_trade_policy": 7,
+    "related_party_governance": 8,
+    "equity_dilution_control": 9,
+    "debt_liquidity_covenant": 10,
+    "management_board_governance": 11,
+    "disclosure_ir_consistency": 12,
+}
+READ_FIRST_DOMAINS = {
+    "audit_going_concern",
+    "legal_proceedings_litigation",
+    "material_contracts",
+    "guarantees_commitments",
+    "tax_cross_border",
+    "cybersecurity_governance",
+    "internal_control_reporting",
+    "regulatory_trade_policy",
+    "related_party_governance",
+}
 
 
 @dataclass(frozen=True)
@@ -42,8 +69,18 @@ class EvidenceRoute:
     assessment: EvidenceAssessment
 
 
+@dataclass(frozen=True)
+class CardCandidate:
+    """Pre-card domain candidate before cross-domain consolidation."""
+
+    domain: str
+    accepted: list[EvidenceRoute]
+    suppressed: list[EvidenceRoute]
+    priority: str
+
+
 def generate_risk_card_report(document: ParsedDocument) -> RiskCardReport:
-    """Generate a v0.2 risk-card report from a parsed document."""
+    """Generate a v0.3 risk-card report from a parsed document."""
 
     form_type, mode = detect_document_mode(document)
     paragraphs = split_paragraphs(document.content)
@@ -76,20 +113,86 @@ def _generate_cards(routes: list[ParagraphRoute]) -> list[RiskCard]:
         for domain in route.risk_domains:
             grouped[domain].append(route)
 
-    candidates: list[tuple[str, list[EvidenceRoute], list[EvidenceRoute], str]] = []
+    candidates: list[CardCandidate] = []
     for domain, domain_routes in grouped.items():
         accepted, suppressed = _assess_domain_routes(domain, domain_routes)
         if not accepted:
             continue
         text = " ".join(item.route.text for item in accepted)
         priority = priority_for(domain, text, len(accepted))
-        candidates.append((domain, accepted, suppressed, priority))
-    candidates.sort(key=lambda item: (PRIORITY_SORT.get(item[3], 9), item[1][0].route.paragraph_id, item[0]))
+        candidates.append(CardCandidate(domain, accepted, suppressed, priority))
+    candidates = _consolidate_candidates(candidates)
+    candidates.sort(
+        key=lambda item: (
+            PRIORITY_SORT.get(item.priority, 9),
+            DOMAIN_SORT.get(item.domain, 99),
+            item.accepted[0].route.paragraph_id,
+            item.domain,
+        )
+    )
 
     cards: list[RiskCard] = []
-    for index, (domain, accepted, suppressed, priority) in enumerate(candidates[:MAX_CARDS], start=1):
-        cards.append(_build_card(index, domain, accepted, suppressed, priority))
+    for index, candidate in enumerate(candidates[:MAX_CARDS], start=1):
+        cards.append(
+            _build_card(
+                index,
+                candidate.domain,
+                candidate.accepted,
+                candidate.suppressed,
+                candidate.priority,
+            )
+        )
     return cards
+
+
+def _consolidate_candidates(candidates: list[CardCandidate]) -> list[CardCandidate]:
+    """Suppress duplicate-prone cards when a stronger primary card covers the evidence."""
+
+    by_domain = {candidate.domain: candidate for candidate in candidates}
+    result: list[CardCandidate] = []
+    for candidate in candidates:
+        if _should_suppress_candidate(candidate, by_domain):
+            continue
+        result.append(candidate)
+    return result
+
+
+def _should_suppress_candidate(
+    candidate: CardCandidate,
+    by_domain: dict[str, CardCandidate],
+) -> bool:
+    if candidate.domain == "debt_liquidity_covenant":
+        guarantee = by_domain.get("guarantees_commitments")
+        if guarantee and _source_overlap(candidate, guarantee) >= 0.5 and _is_partner_guarantee_duplicate(candidate):
+            return True
+        if not _has_true_debt_or_covenant_context(candidate):
+            return True
+
+    if candidate.domain == "equity_dilution_control":
+        guarantee = by_domain.get("guarantees_commitments")
+        if guarantee and _source_overlap(candidate, guarantee) > 0 and _is_warrant_only_guarantee_duplicate(candidate):
+            return True
+        if _is_stock_comp_only_equity_candidate(candidate):
+            return True
+
+    if candidate.domain == "disclosure_ir_consistency":
+        litigation = by_domain.get("legal_proceedings_litigation")
+        if litigation and _source_overlap(candidate, litigation) >= 0.25 and not _has_standalone_disclosure_issue(candidate):
+            return True
+        if not _has_standalone_disclosure_issue(candidate):
+            return True
+
+    if candidate.domain == "management_board_governance":
+        litigation = by_domain.get("legal_proceedings_litigation")
+        cybersecurity = by_domain.get("cybersecurity_governance")
+        if litigation and _source_overlap(candidate, litigation) >= 0.25 and _is_litigation_or_buyback_governance_duplicate(candidate):
+            return True
+        if cybersecurity and _source_overlap(candidate, cybersecurity) >= 0.25:
+            return True
+        if _is_weak_governance_candidate(candidate):
+            return True
+
+    return False
 
 
 def _assess_domain_routes(
@@ -108,6 +211,107 @@ def _assess_domain_routes(
     accepted.sort(key=lambda item: (-item.assessment.score, item.route.paragraph_id))
     suppressed.sort(key=lambda item: (item.route.paragraph_id, item.assessment.score))
     return accepted, suppressed
+
+
+def _source_overlap(left: CardCandidate, right: CardCandidate) -> float:
+    left_ids = {item.route.paragraph_id for item in left.accepted}
+    right_ids = {item.route.paragraph_id for item in right.accepted}
+    if not left_ids:
+        return 0.0
+    return len(left_ids & right_ids) / len(left_ids)
+
+
+def _candidate_text(candidate: CardCandidate) -> str:
+    return " ".join(item.route.text for item in candidate.accepted).lower()
+
+
+def _is_partner_guarantee_duplicate(candidate: CardCandidate) -> bool:
+    text = _candidate_text(candidate)
+    has_guarantee_context = bool(re.search(r"guarantee|guaranty|lease obligations?|partner|warrants?", text))
+    has_true_debt_context = bool(
+        re.search(
+            r"debt covenant|financial covenant|credit facility|senior notes?|borrowings?|maturit|"
+            r"refinanc|waiver|revolver|loan agreement|principal repayment",
+            text,
+        )
+    )
+    return has_guarantee_context and not has_true_debt_context
+
+
+def _is_warrant_only_guarantee_duplicate(candidate: CardCandidate) -> bool:
+    text = _candidate_text(candidate)
+    has_warrant_context = "warrant" in text
+    has_standalone_equity_context = bool(
+        re.search(
+            r"dilution|convertible|earnout|share issuance|equity issuance|voting rights?|"
+            r"registration rights?|change[- ]of[- ]control|rsu|restricted stock|pipe",
+            text,
+        )
+    )
+    return has_warrant_context and not has_standalone_equity_context
+
+
+def _has_true_debt_or_covenant_context(candidate: CardCandidate) -> bool:
+    text = _candidate_text(candidate)
+    return bool(
+        re.search(
+            r"debt covenant|financial covenant|credit facility|senior notes?|borrowings?|"
+            r"short[- ]term debt|long[- ]term debt|maturit(?:y|ies)|refinanc|waiver|revolver|"
+            r"loan agreement|principal repayment|commercial paper",
+            text,
+        )
+    )
+
+
+def _is_stock_comp_only_equity_candidate(candidate: CardCandidate) -> bool:
+    text = _candidate_text(candidate)
+    true_equity_risk = bool(
+        re.search(
+            r"convertible notes?|earnout|dilution|share issuance|equity issuance|registration rights?|"
+            r"change[- ]of[- ]control|voting rights?|founder control|pipe",
+            text,
+        )
+    )
+    ordinary_stock_comp = bool(re.search(r"rsu|restricted stock|performance stock|stock-based compensation|espp", text))
+    return ordinary_stock_comp and not true_equity_risk
+
+
+def _has_standalone_disclosure_issue(candidate: CardCandidate) -> bool:
+    text = _candidate_text(candidate)
+    return bool(
+        re.search(
+            r"safe harbor|forward[- ]looking|guidance|non[- ]gaap|"
+            r"cannot assure|investor presentation|earnings call|public statement",
+            text,
+        )
+    )
+
+
+def _is_litigation_or_buyback_governance_duplicate(candidate: CardCandidate) -> bool:
+    text = _candidate_text(candidate)
+    litigation_context = bool(re.search(r"derivative|lawsuit|litigation|complaint|claim|proceeding", text))
+    buyback_context = bool(re.search(r"repurchase|buyback|share repurchase|stock repurchase", text))
+    true_governance_context = bool(
+        re.search(
+            r"audit committee|independent directors?|succession|resign|appoint|transition|"
+            r"committee charter|board oversight|nomination|governance guideline",
+            text,
+        )
+    )
+    return (litigation_context or buyback_context) and not true_governance_context
+
+
+def _is_weak_governance_candidate(candidate: CardCandidate) -> bool:
+    text = _candidate_text(candidate)
+    true_governance_context = bool(
+        re.search(
+            r"audit committee|independent directors?|succession|resign|appoint|transition|"
+            r"committee charter|board oversight|nomination|governance guideline|internal control",
+            text,
+        )
+    )
+    buyback_only = bool(re.search(r"repurchase|buyback|dividend|stock split", text))
+    return buyback_only and not true_governance_context
 
 
 def _build_card(
@@ -148,6 +352,7 @@ def _build_card(
     evidence_summary = _evidence_summary(domain, facts, accepted, suppressed)
     issuer_specific_interpretation = _issuer_specific_interpretation(domain, template.title, facts)
     finance_reader_implication = _finance_reader_implication(domain, template.title, facts)
+    financial_analysis_difference = _financial_analysis_difference(domain, template.title, facts)
 
     return RiskCard(
         card_id=f"RC-{index:03d}",
@@ -172,10 +377,11 @@ def _build_card(
         issuer_specific_facts=facts,
         issuer_specific_interpretation=issuer_specific_interpretation,
         finance_reader_implication=finance_reader_implication,
+        financial_analysis_difference=financial_analysis_difference,
         evidence_quality=evidence_quality,
         evidence_summary=evidence_summary,
         weak_or_suppressed_sources=suppressed_excerpts,
-        recommended_review_posture=_review_posture(priority, evidence_quality, facts),
+        recommended_review_posture=_review_posture(domain, priority, evidence_quality, facts),
     )
 
 
@@ -287,8 +493,10 @@ def _issuer_specific_interpretation(domain: str, title: str, facts: list[str]) -
             "not as evidence of a cyber incident by itself."
         ),
         "tax_cross_border": (
-            "This should be read as a tax and jurisdictional assumptions review item only to the extent "
-            "issuer-specific tax positions or reserves are disclosed."
+            "This should be read as a deferred-tax, valuation-allowance, and jurisdictional "
+            "assumptions review item. The review point is whether deferred tax assets are supported "
+            "by more-likely-than-not future taxable income assumptions, not simply whether the "
+            "effective tax rate moved."
         ),
     }.get(domain, f"This should be read as an issuer-specific {title.lower()} review item.")
     if fact_text:
@@ -318,6 +526,11 @@ def _finance_reader_implication(domain: str, title: str, facts: list[str]) -> st
             "Finance readers should treat the disclosure as a governance and process-readiness item, with attention "
             "to material incident assessment, vendor risk, and oversight."
         ),
+        "tax_cross_border": (
+            "Finance readers should connect deferred tax assets, valuation allowance releases, uncertain tax "
+            "positions, and jurisdiction-level taxable income assumptions to earnings quality and cash-tax durability. "
+            "A valuation allowance release may be one-time unless the filing supports recurring taxable income."
+        ),
     }.get(
         domain,
         f"Finance readers should verify how the {title.lower()} disclosure connects to accounts, assumptions, cash flow, and investor-facing wording.",
@@ -327,10 +540,77 @@ def _finance_reader_implication(domain: str, title: str, facts: list[str]) -> st
     return base
 
 
-def _review_posture(priority: str, evidence_quality: str, facts: list[str]) -> str:
-    if priority in {"Critical", "High"} and evidence_quality in {"high", "medium"}:
+def _financial_analysis_difference(domain: str, title: str, facts: list[str]) -> str:
+    base = {
+        "legal_proceedings_litigation": (
+            "This is different from ordinary financial analysis because the first question is not revenue, margin, "
+            "or valuation impact. It is how legal status translates into loss contingency, accrual, range-of-loss, "
+            "insurance, timing, and disclosure thresholds."
+        ),
+        "material_contracts": (
+            "This is different from ordinary financial analysis because contract rights, termination terms, IP rights, "
+            "and accounting recognition can change how revenue durability, goodwill, and intangible assets should be read."
+        ),
+        "guarantees_commitments": (
+            "This is different from ordinary financial analysis because the exposure may sit in guarantees, commitments, "
+            "or off-balance-sheet arrangements rather than in a simple debt or capex line."
+        ),
+        "tax_cross_border": (
+            "This is different from ordinary financial analysis because the key issue is not only the effective tax rate. "
+            "It is whether deferred tax assets, valuation allowance releases, uncertain tax positions, and jurisdictional "
+            "taxable-income assumptions are supportable."
+        ),
+        "cybersecurity_governance": (
+            "This is different from ordinary financial analysis because the disclosure is mainly about governance, "
+            "incident materiality assessment, board oversight, and response readiness rather than a current quantified loss."
+        ),
+        "internal_control_reporting": (
+            "This is different from ordinary financial analysis because the issue is reporting reliability, remediation "
+            "evidence, and audit/control conclusions rather than the performance trend itself."
+        ),
+        "regulatory_trade_policy": (
+            "This is different from ordinary financial analysis because rule interpretation, market access, import status, "
+            "sanctions, tariffs, or compliance evidence may drive whether the modeled economics can actually be realized."
+        ),
+        "debt_liquidity_covenant": (
+            "This is different from ordinary financial analysis because contract definitions, covenants, defaults, waivers, "
+            "maturity classification, and acceleration rights can matter more than headline liquidity metrics."
+        ),
+        "equity_dilution_control": (
+            "This is different from ordinary financial analysis because legal instrument terms can change dilution, "
+            "fair-value accounting, voting rights, registration obligations, and investor messaging."
+        ),
+        "management_board_governance": (
+            "This is different from ordinary financial analysis because the issue is governance process, board or committee "
+            "oversight, independence, and disclosure controls rather than the business action alone."
+        ),
+        "disclosure_ir_consistency": (
+            "This is different from ordinary financial analysis because the core question is whether public or management "
+            "wording preserves the filing's uncertainty instead of making the model's base case sound certain."
+        ),
+    }.get(
+        domain,
+        f"This is different from ordinary financial analysis because {title.lower()} language needs legal, audit, "
+        "disclosure, and finance-owner review before it becomes a conclusion.",
+    )
+    if domain == "tax_cross_border" and any("711" in fact for fact in facts):
+        return (
+            f"{base} A disclosed $711 million release should be reviewed as a possible one-time valuation allowance "
+            "or deferred-tax item unless recurring support is clear."
+        )
+    return base
+
+
+def _review_posture(domain: str, priority: str, evidence_quality: str, facts: list[str]) -> str:
+    if domain == "disclosure_ir_consistency":
+        return "appendix"
+    if domain == "management_board_governance" and priority != "High":
+        return "appendix"
+    if domain in READ_FIRST_DOMAINS and priority in {"Critical", "High"} and evidence_quality in {"high", "medium"}:
         return "read-first"
-    if evidence_quality == "high" and facts:
+    if domain in READ_FIRST_DOMAINS and evidence_quality == "high" and facts:
+        return "read-first"
+    if domain in {"tax_cross_border", "cybersecurity_governance"} and evidence_quality == "medium" and facts:
         return "read-first"
     if evidence_quality == "low":
         return "appendix"

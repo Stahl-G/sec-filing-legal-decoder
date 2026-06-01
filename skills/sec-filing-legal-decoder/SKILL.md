@@ -7,7 +7,7 @@ documents.
 ## What To Do
 
 1. Prefer the EDGAR main `.htm/.html` filing document when available.
-2. Use `sec-filing-legal-decoder risk-cards` for the preferred v0.2.1 workflow:
+2. Use `sec-filing-legal-decoder risk-cards` for the preferred v0.3.0 workflow:
    an integrated `legal-risk-review.md` plus issue-level legal risk cards.
 3. Use `sec-filing-legal-decoder review-overlay` when the user has an existing
    finance or earnings analysis and wants legal/governance/disclosure gaps.
@@ -25,6 +25,9 @@ documents.
    `evidence-audit.md` as appendices for card and source-evidence details.
 9. Summarize outputs as issuer-specific legal risk themes, escalation questions,
    management follow-up, and what-not-to-overstate cautions.
+10. Use `--lang zh-CN --term-style bilingual` when the user wants Chinese
+    explanation with key English filing/legal terms preserved. Source excerpts
+    remain in the original filing language.
 
 ## Guardrails
 
@@ -41,6 +44,15 @@ documents.
 ```bash
 sec-filing-legal-decoder risk-cards examples/synthetic_sec_inline_xbrl.htm \
   --output-dir outputs/sample-risk-cards
+```
+
+For Chinese bilingual output:
+
+```bash
+sec-filing-legal-decoder risk-cards examples/synthetic_sec_inline_xbrl.htm \
+  --output-dir outputs/sample-risk-cards-zh \
+  --lang zh-CN \
+  --term-style bilingual
 ```
 
 ## Obsidian Export

@@ -94,7 +94,9 @@ def test_nvidia_like_evidence_filtering_and_synthesis():
             "No customer contracts, existing products, or equity interests were purchased. "
             "We recorded $14.4 billion of goodwill and a $2.5 billion developed technology intangible asset, valued using a cost-to-recreate methodology with a five-year useful life.\n\n"
             "As of January 25, 2026, there are no accrued contingent liabilities associated with the legal proceedings described above based on our belief that liabilities, while reasonably possible, are not probable. "
-            "Further, any possible loss or range of loss in these matters cannot be reasonably estimated at this time."
+            "Further, any possible loss or range of loss in these matters cannot be reasonably estimated at this time.\n\n"
+            "In fiscal year 2026, we released $711 million of valuation allowance on deferred tax assets based on more-likely-than-not future taxable income in certain jurisdictions, while other deferred tax assets remain subject to valuation allowance.\n\n"
+            "Our Board of Directors oversees cybersecurity governance, incident response, vendor risk, and materiality assessment for cybersecurity incidents."
         ),
         parser_backend="html",
         title="NVIDIA 10-K",
@@ -107,7 +109,11 @@ def test_nvidia_like_evidence_filtering_and_synthesis():
     assert "guarantees_commitments" in domains
     assert "material_contracts" in domains
     assert "legal_proceedings_litigation" in domains
-    assert "equity_dilution_control" in domains
+    assert "tax_cross_border" in domains
+    assert "cybersecurity_governance" in domains
+    assert "debt_liquidity_covenant" not in domains
+    assert "equity_dilution_control" not in domains
+    assert "management_board_governance" not in domains
     assert "related_party_governance" not in domains
     assert not any("Tax Identification Number" in source for source in all_sources)
     assert not any("non-affiliates" in source for source in all_sources)
@@ -115,6 +121,7 @@ def test_nvidia_like_evidence_filtering_and_synthesis():
     guarantee_card = next(card for card in report.risk_cards if card.risk_domain == "guarantees_commitments")
     material_card = next(card for card in report.risk_cards if card.risk_domain == "material_contracts")
     litigation_card = next(card for card in report.risk_cards if card.risk_domain == "legal_proceedings_litigation")
+    tax_card = next(card for card in report.risk_cards if card.risk_domain == "tax_cross_border")
 
     assert "$3.5 billion" in " ".join(guarantee_card.issuer_specific_facts)
     assert "$712 million" in " ".join(guarantee_card.issuer_specific_facts)
@@ -122,6 +129,15 @@ def test_nvidia_like_evidence_filtering_and_synthesis():
     assert "$14.4 billion" in " ".join(material_card.issuer_specific_facts)
     assert "$2.5 billion" in " ".join(material_card.issuer_specific_facts)
     assert "reasonably possible" in " ".join(litigation_card.issuer_specific_facts)
+    assert "$711 million" in " ".join(tax_card.issuer_specific_facts)
+    assert all(card.financial_analysis_difference for card in report.risk_cards)
+    assert [card.risk_domain for card in report.risk_cards if card.recommended_review_posture == "read-first"] == [
+        "legal_proceedings_litigation",
+        "material_contracts",
+        "guarantees_commitments",
+        "tax_cross_border",
+        "cybersecurity_governance",
+    ]
 
 
 def test_cli_risk_cards_writes_default_output_set(tmp_path: Path):
@@ -144,6 +160,39 @@ def test_cli_risk_cards_writes_default_output_set(tmp_path: Path):
     assert output_dir.joinpath("management-follow-up.md").exists()
     assert "Executive Takeaway" in output_dir.joinpath("legal-risk-review.md").read_text(encoding="utf-8")
     assert "Internal Control" in output_dir.joinpath("legal-risk-cards.md").read_text(encoding="utf-8")
+
+
+def test_cli_risk_cards_supports_zh_cn_bilingual_output(tmp_path: Path):
+    input_path = tmp_path / "sample.htm"
+    input_path.write_text(
+        "<html><body><p>Form 10-K Annual Report</p>"
+        "<p>As of January 25, 2026, there are no accrued contingent liabilities associated with the legal proceedings described above because liabilities, while reasonably possible, are not probable.</p>"
+        "<p>Groq In December 2025, we entered into a non-exclusive license agreement and recorded $14.4 billion of goodwill and a $2.5 billion developed technology intangible asset.</p>"
+        "</body></html>",
+        encoding="utf-8",
+    )
+    output_dir = tmp_path / "outputs"
+    result = main(
+        [
+            "risk-cards",
+            str(input_path),
+            "--output-dir",
+            str(output_dir),
+            "--lang",
+            "zh-CN",
+            "--term-style",
+            "bilingual",
+        ]
+    )
+
+    assert result == 0
+    review = output_dir.joinpath("legal-risk-review.md").read_text(encoding="utf-8")
+    cards = output_dir.joinpath("legal-risk-cards.md").read_text(encoding="utf-8")
+    assert "法律风险复核" in review
+    assert "重点法务风险主题" in review
+    assert "诉讼及法律程序（Legal Proceedings / Litigation）" in review
+    assert "不宜过度表述" in cards
+    assert "reasonably possible" in cards
 
 
 def test_cli_review_overlay_writes_overlay(tmp_path: Path):

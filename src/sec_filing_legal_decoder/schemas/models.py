@@ -68,7 +68,7 @@ class ReviewReport:
 
 @dataclass(frozen=True)
 class DocumentInfo:
-    """Document identity and filing mode for v0.2 risk-card reports."""
+    """Document identity and filing mode for v0.3 risk-card reports."""
 
     title: str
     form_type: str
@@ -126,6 +126,7 @@ class RiskCard:
     issuer_specific_facts: list[str] = field(default_factory=list)
     issuer_specific_interpretation: str = ""
     finance_reader_implication: str = ""
+    financial_analysis_difference: str = ""
     evidence_quality: str = "medium"
     evidence_summary: str = ""
     weak_or_suppressed_sources: list[SourceExcerpt] = field(default_factory=list)
@@ -134,7 +135,7 @@ class RiskCard:
 
 @dataclass(frozen=True)
 class RiskCardReport:
-    """Document-level v0.2 report centered on risk cards."""
+    """Document-level v0.3 report centered on risk cards."""
 
     document: DocumentInfo
     coverage_summary: CoverageSummary

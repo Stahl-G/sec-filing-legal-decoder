@@ -7,8 +7,17 @@ from collections import defaultdict
 from sec_filing_legal_decoder.schemas import RiskCard, RiskCardReport
 
 
-def render_integrated_legal_risk_review(report: RiskCardReport) -> str:
-    """Render the first-read narrative report for v0.2.1+ workflows."""
+def render_integrated_legal_risk_review(
+    report: RiskCardReport,
+    lang: str = "en",
+    term_style: str = "bilingual",
+) -> str:
+    """Render the first-read narrative report for v0.3.0+ workflows."""
+
+    if lang == "zh-CN":
+        from .zh_cn_reports import render_integrated_legal_risk_review_zh_cn
+
+        return render_integrated_legal_risk_review_zh_cn(report, term_style)
 
     read_first = [card for card in report.risk_cards if card.recommended_review_posture == "read-first"]
     appendix = [card for card in report.risk_cards if card.recommended_review_posture != "read-first"]
@@ -41,7 +50,7 @@ def _frontmatter(report: RiskCardReport) -> list[str]:
         "  - sec-filing",
         "  - legal-risk",
         "  - integrated-review",
-        "  - sec-filing-legal-decoder/v0.2.1",
+        "  - sec-filing-legal-decoder/v0.3.0",
         f'form_type: "{_yaml_escape(report.document.form_type)}"',
         f'document_mode: "{_yaml_escape(report.document.mode)}"',
         f'source_path: "{_yaml_escape(report.document.source_path)}"',
@@ -105,6 +114,10 @@ def _theme(index: int, card: RiskCard) -> list[str]:
         f"- Priority: `{card.priority}`",
         f"- Evidence quality: `{card.evidence_quality}`",
         f"- Owners: {', '.join(card.owners)}",
+        "",
+        "#### How This Differs From Ordinary Financial Analysis",
+        "",
+        card.financial_analysis_difference,
         "",
         "#### What The Filing Says",
         "",

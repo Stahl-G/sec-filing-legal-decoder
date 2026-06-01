@@ -1,12 +1,21 @@
-"""Markdown rendering for v0.2 management follow-up notes."""
+"""Markdown rendering for v0.3 management follow-up notes."""
 
 from __future__ import annotations
 
 from sec_filing_legal_decoder.schemas import RiskCardReport
 
 
-def render_management_follow_up_report(report: RiskCardReport) -> str:
+def render_management_follow_up_report(
+    report: RiskCardReport,
+    lang: str = "en",
+    term_style: str = "bilingual",
+) -> str:
     """Render a concise management follow-up note."""
+
+    if lang == "zh-CN":
+        from .zh_cn_reports import render_management_follow_up_report_zh_cn
+
+        return render_management_follow_up_report_zh_cn(report, term_style)
 
     lines = [
         "---",

@@ -1,4 +1,4 @@
-"""Risk-card generation for v0.2 legal-to-finance workflows."""
+"""Risk-card generation for v0.3 legal-to-finance workflows."""
 
 from .risk_domain_classifier import classify_risk_domains
 

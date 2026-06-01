@@ -1,4 +1,4 @@
-"""Role-specific question bank for v0.2 risk cards."""
+"""Role-specific question bank for v0.3 risk cards."""
 
 from __future__ import annotations
 
