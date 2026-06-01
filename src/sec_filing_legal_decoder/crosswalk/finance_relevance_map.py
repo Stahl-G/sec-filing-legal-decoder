@@ -77,7 +77,7 @@ SECTION_GUIDANCE: dict[str, dict[str, object]] = {
         "compare": ["prior-year wording", "new named parties", "new amounts", "new specific events"],
     },
     "unknown": {
-        "plain": "The paragraph does not match the v0.1 legal-heavy filing categories with high confidence.",
+        "plain": "The paragraph does not match the current legal-heavy filing categories with high confidence.",
         "business": "Review manually if it appears important to the filing narrative.",
         "financial": "Map manually to financial statements, MD&A, or footnotes if relevant.",
         "compare": ["surrounding section heading", "prior-year wording", "related footnotes"],

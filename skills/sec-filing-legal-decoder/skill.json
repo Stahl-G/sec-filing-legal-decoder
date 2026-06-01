@@ -2,7 +2,7 @@
   "name": "sec-filing-legal-decoder",
   "title": "SEC Filing Legal Decoder",
   "description": "AI agent skill and CLI for decoding legal-heavy SEC filing sections into finance-readable risk notes, triage decisions, and escalation questions.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "entrypoint": "sec-filing-legal-decoder",
   "tags": [
     "sec-filings",

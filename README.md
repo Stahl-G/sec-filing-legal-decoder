@@ -25,26 +25,26 @@ and material contracts.
 
 ## What This Project Is
 
-- A deterministic v0.1 toolkit for legal-to-finance filing triage.
+- A deterministic v0.1.1 toolkit for legal-to-finance filing triage.
 - A CLI that reads SEC `.htm/.html` Inline XBRL main documents, Markdown, and
   TXT today.
 - An optional MinerU adapter for PDF/Office fallback when the source is not an
   EDGAR HTML main filing.
 - A generator for legal-to-finance review notes, reading decisions, escalation questions,
-  Markdown reports, JSON output, and management memo drafts.
+  Obsidian-friendly Markdown reports, JSON output, and management memo drafts.
 - A model-agnostic workflow layer that can later work with ChatGPT, Claude,
   Codex, OpenCode, local LLMs, or manual review.
 
 ## 这个项目是什么
 
-- 一个 deterministic v0.1 工具，用于把 filing 里的法律语言转成 finance reader
+- 一个 deterministic v0.1.1 工具，用于把 filing 里的法律语言转成 finance reader
   能用的 triage 输出。
 - 一个 CLI，目前可以直接读取 SEC `.htm/.html` Inline XBRL 主文件、Markdown 和
   TXT。
 - 一个可选 MinerU adapter，只在 PDF/Office 等非 EDGAR HTML 主文件场景下作为
   fallback。
 - 一个可以生成 legal-to-finance review notes、reading decisions、escalation questions、
-  Markdown report、JSON output 和 management memo draft 的工具。
+  Obsidian-friendly Markdown report、JSON output 和 management memo draft 的工具。
 - 一个 model-agnostic workflow layer，未来可以接 ChatGPT、Claude、Codex、
   OpenCode、本地 LLM 或人工 review。
 
@@ -309,8 +309,10 @@ If this works, your local installation is ready.
 
 ### 6. Optional: Install Obsidian
 
-Obsidian is optional. You only need it if you want to read the generated notes
-as a local knowledge base.
+Obsidian is optional. The normal `--out report.md` file is already
+Obsidian-friendly Markdown with YAML properties, tags, tables, and callouts.
+You only need the Obsidian app if you want to open the generated notes as a
+local knowledge base.
 
 After installing Obsidian, create or choose a vault folder. Then run:
 
@@ -486,8 +488,9 @@ sec-filing-legal-decoder analyze examples/synthetic_legal_proceedings.md \
 
 ### 6. 可选：安装 Obsidian
 
-Obsidian 是可选的。只有当你想把生成结果作为本地知识库阅读时，才需要安装
-Obsidian。
+Obsidian 是可选的。普通 `--out report.md` 已经是 Obsidian-friendly Markdown，
+包含 YAML properties、tags、tables 和 callouts。只有当你想把生成结果作为本地
+知识库阅读时，才需要安装 Obsidian。
 
 安装 Obsidian 后，创建或选择一个 vault 文件夹，然后运行：
 
@@ -584,7 +587,7 @@ sec-filing-legal-decoder analyze examples/synthetic_sec_inline_xbrl.htm \
 
 Expected result:
 
-- A Markdown review report at `outputs/report.md`
+- An Obsidian-friendly Markdown review report at `outputs/report.md`
 - A structured JSON report at `outputs/report.json`
 - Reading decisions such as `SKIM`, `DEEP_READ`, or `ESCALATE`
 - Legal-to-finance notes and role-specific escalation questions
@@ -610,7 +613,7 @@ sec-filing-legal-decoder analyze examples/synthetic_sec_inline_xbrl.htm \
 
 预期结果：
 
-- `outputs/report.md` 里有 Markdown review report
+- `outputs/report.md` 里有 Obsidian-friendly Markdown review report
 - `outputs/report.json` 里有结构化 JSON report
 - 结果包含 `SKIM`、`DEEP_READ`、`ESCALATE` 等 reading decisions
 - 结果包含 legal-to-finance notes 和 role-specific escalation questions
@@ -727,7 +730,9 @@ sec-filing-legal-decoder analyze tsla-20251231.htm \
   --year 2025
 ```
 
-Obsidian export will create a linked note set:
+Obsidian export will create a linked note set. Only priority paragraphs
+(`DEEP_READ` and `ESCALATE`) are split into atomic paragraph notes by default,
+so a large 10-K does not flood your vault with low-value notes.
 
 ```text
 SEC Filings/TSLA/2025 10-K/
@@ -744,7 +749,9 @@ SEC Filings/TSLA/2025 10-K/
     report.json
 ```
 
-Obsidian export 会生成一组互相链接的 notes：
+Obsidian export 会生成一组互相链接的 notes。默认只把 priority paragraphs
+（`DEEP_READ` 和 `ESCALATE`）拆成 atomic paragraph notes，避免大型 10-K 把 vault
+刷满低价值段落。
 
 ```text
 SEC Filings/TSLA/2025 10-K/
@@ -947,6 +954,12 @@ skills/
 
 ## Roadmap
 
+v0.1.1:
+
+- Obsidian-friendly default Markdown report output
+- Obsidian vault export with YAML properties, tags, wikilinks, and official callouts
+- Priority-only atomic paragraph notes for `DEEP_READ` and `ESCALATE`
+
 v0.1:
 
 - Rule-based legal-heavy paragraph classification
@@ -956,7 +969,7 @@ v0.1:
 - EDGAR HTML / Inline XBRL main document input
 - Optional MinerU CLI fallback for PDF/Office
 
-v0.2:
+v0.3:
 
 - Prior-year wording diff reviewer
 - SEC `20-F` / `10-K` / `10-Q` / `40-F` section mapper
@@ -964,7 +977,7 @@ v0.2:
 - Better source citation and page/section references
 - Optional LLM adapter
 
-v0.3:
+v0.4:
 
 - Finance-to-legal decoder
 - Governance-to-investor decoder
@@ -973,6 +986,12 @@ v0.3:
 - CI-based redaction checks
 
 ## 路线图
+
+v0.1.1:
+
+- 默认输出 Obsidian-friendly Markdown report
+- Obsidian vault export，包含 YAML properties、tags、wikilinks 和官方 callouts
+- 只为 `DEEP_READ` 和 `ESCALATE` 生成 priority atomic paragraph notes
 
 v0.1:
 
@@ -983,7 +1002,7 @@ v0.1:
 - EDGAR HTML / Inline XBRL 主文件输入
 - PDF/Office 场景下的可选 MinerU CLI fallback
 
-v0.2:
+v0.3:
 
 - 去年 wording diff reviewer
 - SEC `20-F` / `10-K` / `10-Q` / `40-F` section mapper
@@ -991,7 +1010,7 @@ v0.2:
 - 更好的 source citation 和 page/section references
 - 可选 LLM adapter
 
-v0.3:
+v0.4:
 
 - Finance-to-legal decoder
 - Governance-to-investor decoder
@@ -1003,11 +1022,17 @@ v0.3:
 
 - SEC Inline XBRL overview: <https://www.sec.gov/data-research/structured-data/inline-xbrl>
 - SEC EDGAR Filer Manual, Volume II, Chapter 5: <https://www.sec.gov/files/edgar/filermanual/efmvol2-c5.pdf>
+- Obsidian Properties: <https://obsidian.md/help/properties>
+- Obsidian Internal links: <https://obsidian.md/help/links>
+- Obsidian Callouts: <https://obsidian.md/help/callouts>
 
 ## 参考资料
 
 - SEC Inline XBRL overview: <https://www.sec.gov/data-research/structured-data/inline-xbrl>
 - SEC EDGAR Filer Manual, Volume II, Chapter 5: <https://www.sec.gov/files/edgar/filermanual/efmvol2-c5.pdf>
+- Obsidian Properties: <https://obsidian.md/help/properties>
+- Obsidian Internal links: <https://obsidian.md/help/links>
+- Obsidian Callouts: <https://obsidian.md/help/callouts>
 
 ## Disclaimer
 

@@ -34,13 +34,13 @@ def test_obsidian_export_writes_linked_note_set(tmp_path: Path):
     assert "ESCALATE" in dashboard
 
     index = base.joinpath("02 Reading Decision Index.md").read_text(encoding="utf-8")
-    assert "```dataview" in index
-    assert 'FROM "SEC Filings/TSLA/2025 10-K/paragraphs"' in index
+    assert "does not require the Dataview plugin" in index
+    assert "[[paragraphs/" in index
 
     paragraph_notes = list(base.joinpath("paragraphs").glob("*.md"))
     assert paragraph_notes
     paragraph_text = paragraph_notes[-1].read_text(encoding="utf-8")
-    assert "decision::" in paragraph_text
+    assert "## Review Properties" in paragraph_text
     assert "> [!danger] Reading Decision" in paragraph_text
     assert "## Escalation Questions" in paragraph_text
 

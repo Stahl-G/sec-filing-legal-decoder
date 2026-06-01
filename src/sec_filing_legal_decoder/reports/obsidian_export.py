@@ -35,26 +35,27 @@ def export_obsidian_vault(report: ReviewReport, options: ObsidianExportOptions) 
     data_dir.mkdir(parents=True, exist_ok=True)
 
     context = _context(report, options)
+    priority = _priority_analyses(report)
     paragraph_files = {
-        item.paragraph_id: _paragraph_file_name(item) for item in report.analyses
+        item.paragraph_id: _paragraph_file_name(item) for item in priority
     }
 
     written: list[Path] = []
     file_payloads = {
-        base_dir / "00 Dashboard.md": _dashboard(report, context, paragraph_files),
+        base_dir / "00 Dashboard.md": _dashboard(report, context, priority, paragraph_files),
         base_dir / "01 Executive Summary.md": _executive_summary(report, context),
         base_dir / "02 Reading Decision Index.md": _reading_decision_index(
-            report, context, paragraph_files
+            report, context, priority, paragraph_files
         ),
         base_dir / "03 Escalation Matrix.md": _escalation_matrix(
-            report, context, paragraph_files
+            context, priority, paragraph_files
         ),
         base_dir / "04 Management Memo.md": _management_memo(report, context),
         base_dir / "05 Legal-to-Finance Notes.md": _legal_to_finance_notes(
-            report, context, paragraph_files
+            context, priority, paragraph_files
         ),
         base_dir / "06 Suggested Questions.md": _suggested_questions(
-            report, context, paragraph_files
+            context, priority, paragraph_files
         ),
         data_dir / "report.json": render_json_report(report),
     }
@@ -63,7 +64,7 @@ def export_obsidian_vault(report: ReviewReport, options: ObsidianExportOptions) 
         _write(path, content)
         written.append(path)
 
-    for item in report.analyses:
+    for item in priority:
         path = paragraphs_dir / paragraph_files[item.paragraph_id]
         _write(path, _paragraph_note(item, context))
         written.append(path)
@@ -85,13 +86,19 @@ def _context(report: ReviewReport, options: ObsidianExportOptions) -> dict[str, 
 
 
 def _dashboard(
-    report: ReviewReport, context: dict[str, str], paragraph_files: dict[int, str]
+    report: ReviewReport,
+    context: dict[str, str],
+    priority: list[ParagraphAnalysis],
+    paragraph_files: dict[int, str],
 ) -> str:
     decisions = Counter(item.reading_decision for item in report.analyses)
-    owners = _owner_counts(report)
+    owners = _owner_counts(priority)
     lines = [
         * _frontmatter("dashboard", context),
         f"# {context['company']} {context['year']} {context['form']} Dashboard".strip(),
+        "",
+        "> [!summary] Executive Summary",
+        * _quote_lines(report.executive_summary),
         "",
         "## Key Outputs",
         "",
@@ -111,22 +118,25 @@ def _dashboard(
         f"- Year: {context['year'] or 'not specified'}",
         f"- Source: `{context['source']}`",
         f"- Paragraphs analyzed: {len(report.analyses)}",
+        f"- Priority paragraphs: {len(priority)}",
         "",
         "## Reading Decision Snapshot",
         "",
+        "| Decision | Count |",
+        "| --- | ---: |",
     ]
-    for decision in ["SKIP", "SKIM", "READ", "DEEP_READ", "ESCALATE"]:
-        lines.append(f"- {decision}: {decisions.get(decision, 0)}")
+    for decision in ["ESCALATE", "DEEP_READ", "READ", "SKIM", "SKIP"]:
+        lines.append(f"| {decision} | {decisions.get(decision, 0)} |")
     lines.extend(["", "## Escalation Owner Snapshot", ""])
     if owners:
         for owner, count in sorted(owners.items()):
             lines.append(f"- {owner}: {count}")
     else:
         lines.append("- No owner-specific escalation questions were generated.")
-    lines.extend(["", "## Top Flagged", ""])
-    if report.top_flagged_paragraphs:
-        for paragraph_id in report.top_flagged_paragraphs:
-            item = _analysis_by_id(report)[paragraph_id]
+    lines.extend(["", "## Priority Paragraph Notes", ""])
+    if priority:
+        for item in priority:
+            paragraph_id = item.paragraph_id
             lines.append(
                 f"- [[paragraphs/{_link_stem(paragraph_files[paragraph_id])}|"
                 f"P{paragraph_id:04d} - {item.section_type} - {item.reading_decision}]]"
@@ -156,7 +166,10 @@ def _executive_summary(report: ReviewReport, context: dict[str, str]) -> str:
 
 
 def _reading_decision_index(
-    report: ReviewReport, context: dict[str, str], paragraph_files: dict[int, str]
+    report: ReviewReport,
+    context: dict[str, str],
+    priority: list[ParagraphAnalysis],
+    paragraph_files: dict[int, str],
 ) -> str:
     grouped: dict[str, list[ParagraphAnalysis]] = defaultdict(list)
     for item in report.analyses:
@@ -166,12 +179,8 @@ def _reading_decision_index(
         * _frontmatter("reading-index", context),
         "# Reading Decision Index",
         "",
-        "```dataview",
-        'TABLE decision, section_type, owner, confidence',
-        f'FROM "{context["folder"]}/paragraphs"',
-        'WHERE decision = "ESCALATE" OR decision = "DEEP_READ"',
-        "SORT decision DESC",
-        "```",
+        "> [!info] Note",
+        "> This index uses ordinary Markdown lists and Obsidian wikilinks. It does not require the Dataview plugin.",
         "",
     ]
     for decision in ["ESCALATE", "DEEP_READ", "READ", "SKIM", "SKIP"]:
@@ -181,20 +190,30 @@ def _reading_decision_index(
             lines.extend(["No paragraphs in this category.", ""])
             continue
         for item in items:
+            if item.paragraph_id in paragraph_files:
+                target = f"[[paragraphs/{_link_stem(paragraph_files[item.paragraph_id])}|P{item.paragraph_id:04d}]]"
+            else:
+                target = f"P{item.paragraph_id:04d}"
+            lines.append(f"- {target} - `{item.section_type}` - confidence {item.confidence:.2f}")
+        lines.append("")
+    if priority:
+        lines.extend(["## Priority Notes", ""])
+        for item in priority:
             lines.append(
                 f"- [[paragraphs/{_link_stem(paragraph_files[item.paragraph_id])}|"
-                f"P{item.paragraph_id:04d} - {item.section_type}]]"
-                f" - confidence {item.confidence:.2f}"
+                f"P{item.paragraph_id:04d} - {item.section_type} - {item.reading_decision}]]"
             )
         lines.append("")
     return "\n".join(lines)
 
 
 def _escalation_matrix(
-    report: ReviewReport, context: dict[str, str], paragraph_files: dict[int, str]
+    context: dict[str, str],
+    priority: list[ParagraphAnalysis],
+    paragraph_files: dict[int, str],
 ) -> str:
     matrix: dict[str, list[ParagraphAnalysis]] = defaultdict(list)
-    for item in report.analyses:
+    for item in priority:
         for role in item.escalation_questions:
             matrix[role].append(item)
 
@@ -219,10 +238,14 @@ def _management_memo(report: ReviewReport, context: dict[str, str]) -> str:
 
 
 def _legal_to_finance_notes(
-    report: ReviewReport, context: dict[str, str], paragraph_files: dict[int, str]
+    context: dict[str, str],
+    priority: list[ParagraphAnalysis],
+    paragraph_files: dict[int, str],
 ) -> str:
     lines = [* _frontmatter("legal-to-finance-notes", context), "# Legal-to-Finance Notes", ""]
-    for item in report.analyses:
+    if not priority:
+        return "\n".join(lines + ["No priority paragraphs were flagged.", ""])
+    for item in priority:
         lines.extend(
             [
                 f"## [[paragraphs/{_link_stem(paragraph_files[item.paragraph_id])}|P{item.paragraph_id:04d} - {item.section_type}]]",
@@ -238,11 +261,13 @@ def _legal_to_finance_notes(
 
 
 def _suggested_questions(
-    report: ReviewReport, context: dict[str, str], paragraph_files: dict[int, str]
+    context: dict[str, str],
+    priority: list[ParagraphAnalysis],
+    paragraph_files: dict[int, str],
 ) -> str:
     lines = [* _frontmatter("suggested-questions", context), "# Suggested Questions", ""]
     by_role: dict[str, list[tuple[ParagraphAnalysis, str]]] = defaultdict(list)
-    for item in report.analyses:
+    for item in priority:
         for role, questions in item.escalation_questions.items():
             for question in questions:
                 by_role[role].append((item, question))
@@ -289,12 +314,14 @@ def _paragraph_note(item: ParagraphAnalysis, context: dict[str, str]) -> str:
         f"> [!{callout}] Reading Decision",
         f"> {item.reading_decision}",
         "",
-        f"decision:: {item.reading_decision}",
-        f"section_type:: {item.section_type}",
-        f"owner:: {owner_text}",
-        f"confidence:: {item.confidence:.2f}",
-        f"source:: {context['title']}",
-        f"source_ref:: {item.source_ref}",
+        "## Review Properties",
+        "",
+        f"- Decision: `{item.reading_decision}`",
+        f"- Section type: `{item.section_type}`",
+        f"- Owner: {owner_text}",
+        f"- Confidence: {item.confidence:.2f}",
+        f"- Source: {context['title']}",
+        f"- Source ref: `{item.source_ref}`",
         "",
         "## Plain-English Meaning",
         "",
@@ -350,6 +377,8 @@ def _frontmatter(note_type: str, context: dict[str, str]) -> list[str]:
         "  - sec-filing",
         "  - legal-to-finance",
         f"  - note/{note_type}",
+        "aliases:",
+        f"  - { _yaml_scalar(context['company'] + ' ' + note_type) }",
         "---",
         "",
     ]
@@ -365,13 +394,9 @@ def _paragraph_title(item: ParagraphAnalysis) -> str:
     return f"P{item.paragraph_id:04d} - {item.section_type.replace('_', ' ').title()} - {item.reading_decision}"
 
 
-def _analysis_by_id(report: ReviewReport) -> dict[int, ParagraphAnalysis]:
-    return {item.paragraph_id: item for item in report.analyses}
-
-
-def _owner_counts(report: ReviewReport) -> Counter[str]:
+def _owner_counts(items: list[ParagraphAnalysis]) -> Counter[str]:
     counts: Counter[str] = Counter()
-    for item in report.analyses:
+    for item in items:
         for owner in _owners(item):
             counts[owner] += 1
     return counts
@@ -397,6 +422,18 @@ def _callout_for_decision(decision: str) -> str:
 
 def _disclaimer_callout(report: ReviewReport) -> str:
     return "\n".join(["> [!caution] Disclaimer", f"> {report.disclaimer}"])
+
+
+def _priority_analyses(report: ReviewReport) -> list[ParagraphAnalysis]:
+    return [
+        item
+        for item in report.analyses
+        if item.reading_decision in {"DEEP_READ", "ESCALATE"}
+    ]
+
+
+def _quote_lines(text: str) -> list[str]:
+    return [f"> {line}" if line else ">" for line in text.splitlines()]
 
 
 def _safe_join(vault: Path, folder: str) -> Path:

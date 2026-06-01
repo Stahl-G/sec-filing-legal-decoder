@@ -31,7 +31,7 @@ def render_management_memo(report: ReviewReport) -> str:
     if not flagged:
         lines.extend(
             [
-                "No paragraphs were flagged for deep review or escalation by v0.1 rules.",
+                "No paragraphs were flagged for deep review or escalation by the current rule set.",
                 "",
             ]
         )

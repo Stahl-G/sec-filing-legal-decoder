@@ -92,7 +92,7 @@ def _briefing_sentence(
     if reading_decision == "ESCALATE":
         return (
             f"Management should review this {section_label} disclosure because "
-            f"the v0.1 rules flagged it as {boilerplate_or_material} and suitable "
+            f"the current rules flagged it as {boilerplate_or_material} and suitable "
             "for role-specific escalation questions."
         )
     if reading_decision == "DEEP_READ":
@@ -103,7 +103,7 @@ def _briefing_sentence(
     if boilerplate_or_material == "likely_boilerplate":
         return (
             f"This {section_label} language appears likely boilerplate under "
-            "v0.1 rules, but wording changes or specific facts should still be checked."
+            "the current rules, but wording changes or specific facts should still be checked."
         )
     return (
         f"This {section_label} language should be read in context before drawing "

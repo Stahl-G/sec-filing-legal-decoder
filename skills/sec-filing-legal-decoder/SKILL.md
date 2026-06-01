@@ -7,7 +7,7 @@ documents.
 ## What To Do
 
 1. Prefer the EDGAR main `.htm/.html` filing document when available.
-2. Use `sec-filing-legal-decoder analyze` to generate Markdown and JSON reports.
+2. Use `sec-filing-legal-decoder analyze` to generate Obsidian-friendly Markdown and JSON reports.
 3. Use `sec-filing-legal-decoder memo` when the user wants a management-ready
    triage memo.
 4. Use `--obsidian-vault` and `--obsidian-folder` when the user wants a linked
@@ -36,6 +36,10 @@ sec-filing-legal-decoder analyze examples/synthetic_sec_inline_xbrl.htm \
 ```
 
 ## Obsidian Export
+
+The normal `--out report.md` output is already Obsidian-friendly Markdown.
+Use the vault options only when the user wants a linked note set inside an
+Obsidian vault.
 
 ```bash
 sec-filing-legal-decoder analyze input.htm \

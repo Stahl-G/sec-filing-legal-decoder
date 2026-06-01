@@ -49,6 +49,7 @@ def test_html_backend_extracts_visible_inline_xbrl_text(tmp_path: Path):
     assert doc.title == "Tesla 10-K"
     assert "Risk Factors" in doc.content
     assert "subpoena from the SEC" in doc.content
+    assert "Tesla 10-K" not in doc.content
     assert "Hidden Corp" not in doc.content
     assert "ignored" not in doc.content
 

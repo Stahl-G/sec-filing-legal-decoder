@@ -86,6 +86,7 @@ class _VisibleTextHTMLParser(HTMLParser):
             return
         if self._in_title:
             self._title_parts.append(text)
+            return
         self._chunks.append(text)
         self._chunks.append(" ")
 
