@@ -8,7 +8,7 @@ SEC filing sections into finance-readable risk notes, triage decisions, and
 escalation questions. It is especially useful for `10-K`, `10-Q`, `20-F`,
 `40-F`, and annual report review workflows.
 
-法律语言到金融理解的工作流，用于解码 `10-K`、`20-F` 和年报中法律语言较重的
+法律语言到金融理解的工作流，用于解码 `10-K`、`20-F` 等年报文件或是季报文件中法律语言较重的
 章节。
 
 SEC Filing Legal Decoder 是一个 AI agent skill 和 CLI，用来把 SEC filing 中
