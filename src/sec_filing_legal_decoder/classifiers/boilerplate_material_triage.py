@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 
 BOILERPLATE_SIGNALS: tuple[tuple[str, str], ...] = (
-    ("hypothetical_may", r"\bmay\b"),
+    ("hypothetical_may", r"\bmay\b(?!\s+\d{1,2}(?:,?\s+\d{4})?)"),
     ("hypothetical_could", r"\bcould\b"),
     ("from_time_to_time", r"from time to time"),
     ("generic_adverse_effect", r"adversely affect"),
@@ -15,7 +15,6 @@ BOILERPLATE_SIGNALS: tuple[tuple[str, str], ...] = (
 )
 
 MATERIAL_SIGNALS: tuple[tuple[str, str], ...] = (
-    ("actual_has_or_is", r"\b(has|have|is|are|was|were)\b"),
     ("received_notice", r"received (a )?(notice|subpoena|civil investigative demand)"),
     ("investigation", r"investigation|inquiry|subpoena"),
     ("default_or_breach", r"default|breach|event of default|waiver"),
@@ -49,8 +48,9 @@ def triage_paragraph(paragraph: str, section_type: str) -> TriageResult:
     text = paragraph.lower()
     boilerplate = [name for name, pattern in BOILERPLATE_SIGNALS if re.search(pattern, text)]
     material = [name for name, pattern in MATERIAL_SIGNALS if re.search(pattern, text)]
+    material_for_decision = _material_for_decision(material)
 
-    if section_type == "forward_looking_statement" and not _has_specific_fact(material):
+    if section_type == "forward_looking_statement" and not _has_specific_fact(material_for_decision):
         return TriageResult(
             "likely_boilerplate",
             "SKIM",
@@ -58,7 +58,7 @@ def triage_paragraph(paragraph: str, section_type: str) -> TriageResult:
             sorted(set(boilerplate + ["forward_looking_safe_harbor"])),
         )
 
-    if section_type == "generic_boilerplate" and not _has_specific_fact(material):
+    if section_type == "generic_boilerplate" and not _has_specific_fact(material_for_decision):
         return TriageResult(
             "likely_boilerplate",
             "SKIP",
@@ -66,7 +66,7 @@ def triage_paragraph(paragraph: str, section_type: str) -> TriageResult:
             sorted(set(boilerplate)),
         )
 
-    if _requires_escalation(material, section_type):
+    if _requires_escalation(material_for_decision, section_type):
         return TriageResult(
             "potentially_material",
             "ESCALATE",
@@ -74,7 +74,7 @@ def triage_paragraph(paragraph: str, section_type: str) -> TriageResult:
             sorted(set(material + boilerplate)),
         )
 
-    if material:
+    if material_for_decision:
         return TriageResult(
             "potentially_material",
             "DEEP_READ",
@@ -110,6 +110,15 @@ def _has_specific_fact(signals: list[str]) -> bool:
         "actual_commitment",
     }
     return bool(specific.intersection(signals))
+
+
+def _material_for_decision(signals: list[str]) -> list[str]:
+    """Ignore amount-only materiality signals for reading-decision purposes."""
+
+    unique = sorted(set(signals))
+    if unique == ["specific_amount"]:
+        return []
+    return unique
 
 
 def _requires_escalation(signals: list[str], section_type: str) -> bool:

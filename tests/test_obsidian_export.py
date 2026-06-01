@@ -2,8 +2,11 @@ from pathlib import Path
 
 from sec_filing_legal_decoder.cli import main
 from sec_filing_legal_decoder.crosswalk import analyze_document
+from sec_filing_legal_decoder.obsidian import RiskCardObsidianOptions, export_risk_cards_to_obsidian
 from sec_filing_legal_decoder.parser_backends.mock_backend import MockParserBackend
 from sec_filing_legal_decoder.reports import ObsidianExportOptions, export_obsidian_vault
+from sec_filing_legal_decoder.risk_cards import generate_risk_card_report
+from sec_filing_legal_decoder.schemas import ParsedDocument
 
 
 def test_obsidian_export_writes_linked_note_set(tmp_path: Path):
@@ -73,3 +76,40 @@ def test_cli_analyze_obsidian_export(tmp_path: Path):
 
     assert result == 0
     assert vault.joinpath("SEC Filings", "TSLA", "2025 10-K", "00 Dashboard.md").exists()
+
+
+def test_risk_card_obsidian_export_writes_cards(tmp_path: Path):
+    document = ParsedDocument(
+        source_path="toyo-20f.htm",
+        content=(
+            "Form 20-F Annual Report\n\n"
+            "The company disclosed UFLPA, AD/CVD, tariff, and ITC 337 patent litigation risk.\n\n"
+            "The company has warrants and earnout shares that may dilute shareholders."
+        ),
+        parser_backend="html",
+        title="TOYO 20-F",
+    )
+    report = generate_risk_card_report(document)
+    written = export_risk_cards_to_obsidian(
+        report,
+        RiskCardObsidianOptions(
+            output_dir=tmp_path / "obsidian",
+            company="TOYO Co., Ltd.",
+            ticker="TOYO",
+            form="20-F",
+            year="2025",
+        ),
+    )
+
+    base = tmp_path / "obsidian"
+    assert base.joinpath("00 Legal Risk Dashboard.md").exists()
+    assert base.joinpath("01 Escalation Matrix.md").exists()
+    assert base.joinpath("02 Management Follow-up.md").exists()
+    assert base.joinpath("cards").is_dir()
+    assert base.joinpath("data", "legal-risk-cards.json").exists()
+    assert written
+
+    card_text = next(base.joinpath("cards").glob("*.md")).read_text(encoding="utf-8")
+    assert "risk_domain:" in card_text
+    assert "priority:" in card_text
+    assert "## Source Excerpts" in card_text

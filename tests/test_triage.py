@@ -26,3 +26,29 @@ def test_material_weakness_escalates():
         "internal_control",
     )
     assert result.reading_decision == "ESCALATE"
+
+
+def test_may_date_is_not_hypothetical_may():
+    result = triage_paragraph(
+        "As of May 14, 2026, the company had cash and cash equivalents of $12.0 million.",
+        "unknown",
+    )
+    assert "hypothetical_may" not in result.signals
+
+
+def test_specific_amount_alone_does_not_deep_read():
+    result = triage_paragraph(
+        "Revenue increased to $12.0 million for the quarter ended March 31, 2026.",
+        "unknown",
+    )
+    assert result.reading_decision == "READ"
+    assert result.boilerplate_or_material == "uncertain"
+
+
+def test_generic_has_is_does_not_trigger_materiality():
+    result = triage_paragraph(
+        "The company has operations in several markets and is focused on customer service.",
+        "unknown",
+    )
+    assert result.reading_decision == "READ"
+    assert result.signals == []

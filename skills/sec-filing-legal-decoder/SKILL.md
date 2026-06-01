@@ -7,15 +7,22 @@ documents.
 ## What To Do
 
 1. Prefer the EDGAR main `.htm/.html` filing document when available.
-2. Use `sec-filing-legal-decoder analyze` to generate Obsidian-friendly Markdown and JSON reports.
-3. Use `sec-filing-legal-decoder memo` when the user wants a management-ready
+2. Use `sec-filing-legal-decoder risk-cards` for the preferred v0.2 workflow:
+   issue-level legal risk cards for finance readers.
+3. Use `sec-filing-legal-decoder review-overlay` when the user has an existing
+   finance or earnings analysis and wants legal/governance/disclosure gaps.
+4. Use `sec-filing-legal-decoder analyze` only when the user specifically wants
+   legacy paragraph-level review output.
+5. Use `sec-filing-legal-decoder memo` when the user wants a management-ready
    triage memo.
-4. Use `--obsidian-vault` and `--obsidian-folder` when the user wants a linked
-   Obsidian reading workspace.
-5. Focus on legal proceedings, risk factors, regulatory compliance, internal
+6. Use `--obsidian-dir` with `risk-cards` when the user wants linked Obsidian
+   risk-card notes.
+7. Focus on legal proceedings, risk factors, regulatory compliance, internal
    controls, debt covenants, related-party transactions, guarantees,
-   commitments, dilution, and material contracts.
-6. Summarize outputs as risk notes, reading decisions, and escalation questions.
+   commitments, dilution, tax, cybersecurity governance, disclosure consistency,
+   and material contracts.
+8. Summarize outputs as risk cards, escalation questions, management follow-up,
+   and what-not-to-overstate cautions.
 
 ## Guardrails
 
@@ -30,21 +37,20 @@ documents.
 ## First Command
 
 ```bash
-sec-filing-legal-decoder analyze examples/synthetic_sec_inline_xbrl.htm \
-  --out outputs/html-report.md \
-  --json outputs/html-report.json
+sec-filing-legal-decoder risk-cards examples/synthetic_sec_inline_xbrl.htm \
+  --output-dir outputs/sample-risk-cards
 ```
 
 ## Obsidian Export
 
-The normal `--out report.md` output is already Obsidian-friendly Markdown.
-Use the vault options only when the user wants a linked note set inside an
-Obsidian vault.
+The normal `risk-cards --output-dir` Markdown is already Obsidian-friendly.
+Use `--obsidian-dir` when the user wants linked risk-card notes inside an
+Obsidian folder.
 
 ```bash
-sec-filing-legal-decoder analyze input.htm \
-  --obsidian-vault ~/Documents/ObsidianVault \
-  --obsidian-folder "SEC Filings/COMPANY/2025 10-K" \
+sec-filing-legal-decoder risk-cards input.htm \
+  --output-dir outputs/company-risk-cards \
+  --obsidian-dir ~/Documents/ObsidianVault/SEC\ Filings/COMPANY/2025\ 10-K \
   --company "Company Name" \
   --ticker TICKER \
   --form 10-K \

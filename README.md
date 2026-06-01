@@ -1,19 +1,19 @@
 # SEC Filing Legal Decoder
 
-Legal-to-finance workflows for decoding legal-heavy `10-K`, `20-F`, and annual
-report sections.
+Legal Risk Cards for Finance Readers: legal-to-finance workflows for decoding
+legal-heavy `10-K`, `10-Q`, `20-F`, `40-F`, and annual report sections.
 
 SEC Filing Legal Decoder is an AI agent skill and CLI for decoding legal-heavy
-SEC filing sections into finance-readable risk notes, triage decisions, and
-escalation questions. It is especially useful for `10-K`, `10-Q`, `20-F`,
-`40-F`, and annual report review workflows.
+SEC filing sections into finance-readable risk cards, triage decisions,
+escalation questions, and management follow-up notes. It is especially useful
+for `10-K`, `10-Q`, `20-F`, `40-F`, and annual report review workflows.
 
-法律语言到金融理解的工作流，用于解码 `10-K`、`20-F` 等年报文件或是季报文件中法律语言较重的
-章节。
+面向金融读者的法律风险卡工具：把 `10-K`、`10-Q`、`20-F`、`40-F` 和年报/季报中
+法律语言较重的章节，转成 legal-to-finance 工作流输出。
 
 SEC Filing Legal Decoder 是一个 AI agent skill 和 CLI，用来把 SEC filing 中
-法律语言较重的章节解码为金融读者能理解的风险笔记、阅读分级和升级问题。它尤其
-适合 `10-K`、`10-Q`、`20-F`、`40-F` 和年报 review。
+法律语言较重的章节解码为金融读者能理解的风险卡、阅读分级、升级问题和管理层
+跟进事项。它尤其适合 `10-K`、`10-Q`、`20-F`、`40-F` 和年报 review。
 
 It focuses on the non-financial filing language that can change financial
 judgment: legal proceedings, regulatory risk, internal control weaknesses,
@@ -25,26 +25,34 @@ and material contracts.
 
 ## What This Project Is
 
-- A deterministic v0.1.1 toolkit for legal-to-finance filing triage.
+- A deterministic v0.2.0 toolkit for legal-to-finance filing triage.
+- A risk-card generator that groups source paragraphs into issue-level legal,
+  regulatory, governance, audit, disclosure, debt, related-party, dilution, tax,
+  cybersecurity, and material-contract cards.
 - A CLI that reads SEC `.htm/.html` Inline XBRL main documents, Markdown, and
   TXT today.
 - An optional MinerU adapter for PDF/Office fallback when the source is not an
   EDGAR HTML main filing.
 - A generator for legal-to-finance review notes, reading decisions, escalation questions,
-  Obsidian-friendly Markdown reports, JSON output, and management memo drafts.
+  Obsidian-friendly Markdown reports, JSON output, risk-card notes, and management
+  memo drafts.
 - A model-agnostic workflow layer that can later work with ChatGPT, Claude,
   Codex, OpenCode, local LLMs, or manual review.
 
 ## 这个项目是什么
 
-- 一个 deterministic v0.1.1 工具，用于把 filing 里的法律语言转成 finance reader
+- 一个 deterministic v0.2.0 工具，用于把 filing 里的法律语言转成 finance reader
   能用的 triage 输出。
+- 一个 risk-card generator，可以把 source paragraphs 聚合成事项级 legal、
+  regulatory、governance、audit、disclosure、debt、related-party、dilution、
+  tax、cybersecurity 和 material-contract cards。
 - 一个 CLI，目前可以直接读取 SEC `.htm/.html` Inline XBRL 主文件、Markdown 和
   TXT。
 - 一个可选 MinerU adapter，只在 PDF/Office 等非 EDGAR HTML 主文件场景下作为
   fallback。
 - 一个可以生成 legal-to-finance review notes、reading decisions、escalation questions、
-  Obsidian-friendly Markdown report、JSON output 和 management memo draft 的工具。
+  Obsidian-friendly Markdown report、JSON output、risk-card notes 和 management memo
+  draft 的工具。
 - 一个 model-agnostic workflow layer，未来可以接 ChatGPT、Claude、Codex、
   OpenCode、本地 LLM 或人工 review。
 
@@ -116,6 +124,12 @@ matter for Legal, Finance, Auditors, IR, Management, or the Board.
 This project helps answer: should this paragraph be skipped, skimmed, read,
 deep-read, or escalated?
 
+In v0.2.0, the preferred output is no longer a long paragraph-by-paragraph
+report. The preferred output is a small set of issue-level legal risk cards.
+Each card explains what the filing language may mean, why a finance reader
+should care, which owners should review it, what questions to ask, what not to
+overstate, and which source excerpts support the card.
+
 ## 为什么不是又一个财务报表阅读器
 
 很多读者能看懂收入、毛利率、现金流和债务表格。真正拖慢阅读速度的，往往是
@@ -123,6 +137,10 @@ deep-read, or escalated?
 财务相关风险，还是应该升级给 Legal、Finance、Auditor、IR、Management 或 Board。
 
 这个项目帮助回答：这段话应该跳过、略读、正常读、深读，还是升级处理？
+
+在 v0.2.0 中，首选输出不再是很长的逐段报告，而是一组事项级 legal risk cards。
+每张卡会解释 filing 语言可能意味着什么、为什么金融读者需要关心、应该找哪些 owner
+review、该问什么问题、哪些结论不能过度表述，以及支撑这张卡的 source excerpts。
 
 ## How MinerU Fits
 
@@ -663,6 +681,36 @@ python evals/run_evals.py
 
 ## CLI Examples
 
+Generate v0.2 legal risk cards. This is the preferred command for agent
+workflows:
+
+```bash
+sec-filing-legal-decoder risk-cards tsla-20251231.htm \
+  --output-dir outputs/tesla-10k-risk-cards \
+  --obsidian-dir ~/Documents/ObsidianVault/SEC\ Filings/TSLA/2025\ 10-K \
+  --company "Tesla, Inc." \
+  --ticker TSLA \
+  --form 10-K \
+  --year 2025
+```
+
+The output directory contains:
+
+```text
+legal-risk-cards.md
+legal-risk-cards.json
+escalation-questions.md
+management-follow-up.md
+```
+
+Compare an existing finance or earnings analysis against the filing risk cards:
+
+```bash
+sec-filing-legal-decoder review-overlay tsla-20251231.htm \
+  --analysis outputs/tesla-earnings-analysis.md \
+  --output-dir outputs/tesla-review-overlay
+```
+
 Analyze an EDGAR main HTML filing:
 
 ```bash
@@ -707,6 +755,35 @@ sec-filing-legal-decoder memo examples/synthetic_internal_control.md --out outpu
 ```
 
 ## CLI 示例
+
+生成 v0.2 legal risk cards。Agent workflow 推荐优先使用这个命令：
+
+```bash
+sec-filing-legal-decoder risk-cards tsla-20251231.htm \
+  --output-dir outputs/tesla-10k-risk-cards \
+  --obsidian-dir ~/Documents/ObsidianVault/SEC\ Filings/TSLA/2025\ 10-K \
+  --company "Tesla, Inc." \
+  --ticker TSLA \
+  --form 10-K \
+  --year 2025
+```
+
+输出目录会包含：
+
+```text
+legal-risk-cards.md
+legal-risk-cards.json
+escalation-questions.md
+management-follow-up.md
+```
+
+把已有 finance / earnings analysis 和 filing risk cards 做 overlay review：
+
+```bash
+sec-filing-legal-decoder review-overlay tsla-20251231.htm \
+  --analysis outputs/tesla-earnings-analysis.md \
+  --output-dir outputs/tesla-review-overlay
+```
 
 分析 EDGAR HTML 主 filing：
 
@@ -871,6 +948,40 @@ sec-filing-legal-decoder memo samples/tesla/tsla-10ka.htm \
 
 ## Output Schema
 
+The v0.2 `risk-cards` JSON output contains:
+
+- `document`
+- `coverage_summary`
+- `risk_cards`
+- `escalation_matrix`
+- `management_follow_up`
+- `disclosure_consistency_questions`
+- `disclaimer`
+
+Each risk card contains:
+
+- `card_id`
+- `title`
+- `risk_domain`
+- `subdomains`
+- `priority`
+- `reading_decision`
+- `owners`
+- `source_paragraphs`
+- `plain_language_meaning`
+- `why_finance_readers_should_care`
+- `legal_or_audit_relevance`
+- `financial_statement_linkage`
+- `disclosure_ir_relevance`
+- `boilerplate_or_material`
+- `questions`
+- `suggested_management_follow_up`
+- `what_not_to_overstate`
+- `source_excerpts`
+- `confidence`
+
+The legacy `analyze` command still produces paragraph-level output.
+
 Each analyzed paragraph produces:
 
 - `section_type`
@@ -886,6 +997,40 @@ Each analyzed paragraph produces:
 - `source_excerpt`
 
 ## 输出字段
+
+v0.2 `risk-cards` JSON 输出包含：
+
+- `document`
+- `coverage_summary`
+- `risk_cards`
+- `escalation_matrix`
+- `management_follow_up`
+- `disclosure_consistency_questions`
+- `disclaimer`
+
+每张 risk card 包含：
+
+- `card_id`
+- `title`
+- `risk_domain`
+- `subdomains`
+- `priority`
+- `reading_decision`
+- `owners`
+- `source_paragraphs`
+- `plain_language_meaning`
+- `why_finance_readers_should_care`
+- `legal_or_audit_relevance`
+- `financial_statement_linkage`
+- `disclosure_ir_relevance`
+- `boilerplate_or_material`
+- `questions`
+- `suggested_management_follow_up`
+- `what_not_to_overstate`
+- `source_excerpts`
+- `confidence`
+
+旧版 `analyze` command 仍然生成 paragraph-level output。
 
 每个被分析的段落都会输出：
 
@@ -907,6 +1052,11 @@ Each analyzed paragraph produces:
 src/sec_filing_legal_decoder/
   parser_backends/       # HTML, Markdown, TXT, MinerU CLI, mock parser adapters
   classifiers/           # Rule-based section classification and triage
+  document_modes/        # 10-K, 10-Q, 20-F, 40-F, 6-K, earnings-release detection
+  content_routing/       # skip / route-out / analyze paragraph routing
+  risk_cards/            # v0.2 risk-domain classification and card generation
+  overlay/               # compare existing analysis against filing risk cards
+  obsidian/              # v0.2 risk-card Obsidian export
   crosswalk/             # Finance relevance, reading decisions, questions
   reports/               # Markdown, JSON, memo, and Obsidian vault generation
   schemas/               # Dataclass output models
@@ -925,6 +1075,11 @@ The default path runs without MinerU or an LLM API key.
 src/sec_filing_legal_decoder/
   parser_backends/       # HTML、Markdown、TXT、MinerU CLI、mock parser adapters
   classifiers/           # 规则分类和 triage
+  document_modes/        # 10-K、10-Q、20-F、40-F、6-K、earnings-release 检测
+  content_routing/       # skip / route-out / analyze 段落路由
+  risk_cards/            # v0.2 risk-domain 分类和 card generation
+  overlay/               # 把已有 analysis 和 filing risk cards 做对照
+  obsidian/              # v0.2 risk-card Obsidian export
   crosswalk/             # Finance relevance、reading decisions、questions
   reports/               # Markdown、JSON、memo、Obsidian vault 生成
   schemas/               # Dataclass output models
@@ -952,7 +1107,49 @@ skills/
 - 使用 synthetic examples 或公开 filing excerpts。
 - 所有输出都只是 reading aid，需要专业 review。
 
+## Known Issues In v0.2.0
+
+- Long annual reports can still route a large number of paragraphs into the risk
+  candidate pool. The generator caps output at 12 issue-level cards, but future
+  versions should add better section-aware filtering and source clustering.
+- Some heading-only or table-of-contents labels may still be used as weak source
+  support when they contain risk-domain terms. Treat card excerpts as review
+  anchors, not final evidence.
+- Earnings-release `6-K` routing is improved for ordinary revenue, shipment,
+  margin, expense, and guidance KPI text, but disclosure/guidance boundaries may
+  still need issuer-specific tuning.
+- Risk priority is deterministic and rule-based. `Critical`, `High`, and
+  `Medium` are triage priorities, not legal, accounting, audit, or investment
+  conclusions.
+- HTML extraction preserves visible text but does not yet reconstruct original
+  EDGAR section hierarchy, tables, or page locations with full fidelity.
+
+## v0.2.0 已知问题
+
+- 很长的年报仍可能把较多段落 route 到 risk candidate pool。当前 generator 最多输出
+  12 张事项级 cards，但后续版本还需要更强的 section-aware filtering 和 source
+  clustering。
+- 某些只有标题或目录性质的文本，如果包含 risk-domain terms，仍可能作为较弱的
+  source support 出现。请把 card excerpts 当作 review anchors，而不是最终证据。
+- earnings-release `6-K` 对普通 revenue、shipment、margin、expense 和 guidance KPI
+  的路由已经改进，但 disclosure/guidance 边界后续仍可能需要按发行人微调。
+- 风险优先级是 deterministic rule-based triage。`Critical`、`High`、`Medium` 是阅读
+  和跟进优先级，不是法律、会计、审计或投资结论。
+- HTML extraction 会保留可见文本，但还不能完整还原 EDGAR 原始 section hierarchy、
+  tables 或 page locations。
+
 ## Roadmap
+
+v0.2.0:
+
+- Legal Risk Cards for Finance Readers
+- `risk-cards` CLI command for issue-level cards instead of paragraph-by-paragraph noise
+- Document mode detection for `10-K`, `10-Q`, `20-F`, `40-F`, `6-K`, and earnings-release `6-K`
+- Paragraph routing for filing admin, ordinary KPI finance text, business updates, and legal-risk candidates
+- Two-level risk-domain taxonomy covering going concern, ICFR, litigation, trade policy, related parties, debt/liquidity, commitments, dilution, tax, governance, disclosure, cybersecurity, and material contracts
+- `review-overlay` CLI command for checking existing finance analysis against filing legal-risk cards
+- v0.2 Obsidian export centered on risk-card notes
+- False-positive fixes for date `May`, amount-only materiality, generic `has/is/was/were`, and ordinary guidance KPI paragraphs
 
 v0.1.1:
 
@@ -986,6 +1183,17 @@ v0.4:
 - CI-based redaction checks
 
 ## 路线图
+
+v0.2.0:
+
+- 面向金融读者的 Legal Risk Cards
+- 新增 `risk-cards` CLI command，用事项级 cards 替代逐段噪音
+- 支持 `10-K`、`10-Q`、`20-F`、`40-F`、`6-K` 和 earnings-release `6-K` 的 document mode detection
+- 新增 paragraph routing，区分 filing admin、普通财务 KPI、业务更新和 legal-risk candidates
+- 两层 risk-domain taxonomy，覆盖 going concern、ICFR、litigation、trade policy、related party、debt/liquidity、commitments、dilution、tax、governance、disclosure、cybersecurity 和 material contracts
+- 新增 `review-overlay` CLI command，用于把已有 finance analysis 和 filing legal-risk cards 对照
+- v0.2 Obsidian export 以 risk-card notes 为中心
+- 修复 date `May`、amount-only materiality、generic `has/is/was/were` 和普通 guidance KPI paragraphs 的误报
 
 v0.1.1:
 

@@ -64,3 +64,101 @@ class ReviewReport:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class DocumentInfo:
+    """Document identity and filing mode for v0.2 risk-card reports."""
+
+    title: str
+    form_type: str
+    mode: str
+    source_path: str
+    parser_backend: str
+
+
+@dataclass(frozen=True)
+class CoverageSummary:
+    """Routing counts for the risk-card analysis pipeline."""
+
+    paragraphs_total: int
+    paragraphs_skipped_admin: int
+    financial_kpi_routed_out: int
+    business_update_routed_out: int
+    risk_relevant_paragraphs: int
+    risk_cards_generated: int
+
+
+@dataclass(frozen=True)
+class SourceExcerpt:
+    """Short source excerpt supporting a risk card."""
+
+    paragraph_id: int
+    source_ref: str
+    excerpt: str
+
+
+@dataclass(frozen=True)
+class RiskCard:
+    """Issue-level legal risk card for finance readers."""
+
+    card_id: str
+    title: str
+    risk_domain: str
+    subdomains: list[str]
+    priority: str
+    reading_decision: str
+    owners: list[str]
+    source_paragraphs: list[int]
+    plain_language_meaning: str
+    why_finance_readers_should_care: str
+    legal_or_audit_relevance: str
+    financial_statement_linkage: list[str]
+    disclosure_ir_relevance: str
+    boilerplate_or_material: str
+    questions: dict[str, list[str]]
+    suggested_management_follow_up: str
+    what_not_to_overstate: str
+    source_excerpts: list[SourceExcerpt]
+    confidence: float
+
+
+@dataclass(frozen=True)
+class RiskCardReport:
+    """Document-level v0.2 report centered on risk cards."""
+
+    document: DocumentInfo
+    coverage_summary: CoverageSummary
+    risk_cards: list[RiskCard]
+    escalation_matrix: list[dict[str, Any]]
+    management_follow_up: list[str]
+    disclosure_consistency_questions: list[str]
+    disclaimer: str = DISCLAIMER
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class OverlayFinding:
+    """Finding from comparing a filing against an existing analysis."""
+
+    risk_card_id: str
+    risk_card_title: str
+    status: str
+    finding: str
+    suggested_safer_wording: str
+
+
+@dataclass(frozen=True)
+class OverlayReport:
+    """Review overlay report for an existing earnings or filing analysis."""
+
+    document: DocumentInfo
+    analysis_path: str
+    risk_card_report: RiskCardReport
+    findings: list[OverlayFinding]
+    disclaimer: str = DISCLAIMER
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
