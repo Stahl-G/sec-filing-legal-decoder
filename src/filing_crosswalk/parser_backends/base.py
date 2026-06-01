@@ -30,6 +30,7 @@ def choose_backend(parser_name: str, path: Path) -> ParserBackend:
     """Choose a parser backend by explicit name or input suffix."""
 
     from .markdown_backend import MarkdownParserBackend
+    from .html_backend import HtmlParserBackend
     from .mineru_cli_backend import MinerUCliBackend
     from .mock_backend import MockParserBackend
     from .plaintext_backend import PlainTextParserBackend
@@ -38,6 +39,10 @@ def choose_backend(parser_name: str, path: Path) -> ParserBackend:
     by_name: dict[str, ParserBackend] = {
         "markdown": MarkdownParserBackend(),
         "md": MarkdownParserBackend(),
+        "html": HtmlParserBackend(),
+        "htm": HtmlParserBackend(),
+        "inline-xbrl": HtmlParserBackend(),
+        "ixbrl": HtmlParserBackend(),
         "text": PlainTextParserBackend(),
         "txt": PlainTextParserBackend(),
         "plain-text": PlainTextParserBackend(),
@@ -54,6 +59,7 @@ def choose_backend(parser_name: str, path: Path) -> ParserBackend:
             raise ParserError(f"Unknown parser '{parser_name}'. Valid options: {valid}") from exc
 
     auto_backends: list[ParserBackend] = [
+        HtmlParserBackend(),
         MarkdownParserBackend(),
         PlainTextParserBackend(),
     ]
