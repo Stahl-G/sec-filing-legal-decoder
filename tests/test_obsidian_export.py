@@ -1,0 +1,75 @@
+from pathlib import Path
+
+from sec_filing_legal_decoder.cli import main
+from sec_filing_legal_decoder.crosswalk import analyze_document
+from sec_filing_legal_decoder.parser_backends.mock_backend import MockParserBackend
+from sec_filing_legal_decoder.reports import ObsidianExportOptions, export_obsidian_vault
+
+
+def test_obsidian_export_writes_linked_note_set(tmp_path: Path):
+    report = analyze_document(MockParserBackend().parse(Path("mock.md")))
+    written = export_obsidian_vault(
+        report,
+        ObsidianExportOptions(
+            vault=tmp_path,
+            folder="SEC Filings/TSLA/2025 10-K",
+            company="Tesla, Inc.",
+            ticker="TSLA",
+            form="10-K",
+            year="2025",
+        ),
+    )
+
+    base = tmp_path / "SEC Filings" / "TSLA" / "2025 10-K"
+    assert base.joinpath("00 Dashboard.md").exists()
+    assert base.joinpath("02 Reading Decision Index.md").exists()
+    assert base.joinpath("03 Escalation Matrix.md").exists()
+    assert base.joinpath("data", "report.json").exists()
+    assert base.joinpath("paragraphs").is_dir()
+    assert written
+
+    dashboard = base.joinpath("00 Dashboard.md").read_text(encoding="utf-8")
+    assert "[[01 Executive Summary]]" in dashboard
+    assert "Tesla, Inc." in dashboard
+    assert "ESCALATE" in dashboard
+
+    index = base.joinpath("02 Reading Decision Index.md").read_text(encoding="utf-8")
+    assert "```dataview" in index
+    assert 'FROM "SEC Filings/TSLA/2025 10-K/paragraphs"' in index
+
+    paragraph_notes = list(base.joinpath("paragraphs").glob("*.md"))
+    assert paragraph_notes
+    paragraph_text = paragraph_notes[-1].read_text(encoding="utf-8")
+    assert "decision::" in paragraph_text
+    assert "> [!danger] Reading Decision" in paragraph_text
+    assert "## Escalation Questions" in paragraph_text
+
+
+def test_cli_analyze_obsidian_export(tmp_path: Path):
+    input_path = tmp_path / "sample.htm"
+    input_path.write_text(
+        "<html><body><p>The company received a subpoena from the SEC and has accrued a liability of $4.2 million.</p></body></html>",
+        encoding="utf-8",
+    )
+    vault = tmp_path / "vault"
+    result = main(
+        [
+            "analyze",
+            str(input_path),
+            "--obsidian-vault",
+            str(vault),
+            "--obsidian-folder",
+            "SEC Filings/TSLA/2025 10-K",
+            "--company",
+            "Tesla, Inc.",
+            "--ticker",
+            "TSLA",
+            "--form",
+            "10-K",
+            "--year",
+            "2025",
+        ]
+    )
+
+    assert result == 0
+    assert vault.joinpath("SEC Filings", "TSLA", "2025 10-K", "00 Dashboard.md").exists()

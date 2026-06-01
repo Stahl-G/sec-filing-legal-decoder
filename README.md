@@ -299,6 +299,20 @@ sec-filing-legal-decoder analyze tsla-20251231.htm \
   --json outputs/tesla-10k-report.json
 ```
 
+Export the same analysis into an Obsidian vault:
+
+```bash
+sec-filing-legal-decoder analyze tsla-20251231.htm \
+  --out outputs/tesla-10k-report.md \
+  --json outputs/tesla-10k-report.json \
+  --obsidian-vault ~/Documents/ObsidianVault \
+  --obsidian-folder "SEC Filings/TSLA/2025 10-K" \
+  --company "Tesla, Inc." \
+  --ticker TSLA \
+  --form 10-K \
+  --year 2025
+```
+
 Analyze Markdown or TXT:
 
 ```bash
@@ -328,6 +342,54 @@ sec-filing-legal-decoder memo examples/synthetic_internal_control.md --out outpu
 sec-filing-legal-decoder analyze tsla-20251231.htm \
   --out outputs/tesla-10k-report.md \
   --json outputs/tesla-10k-report.json
+```
+
+同时导出到 Obsidian vault：
+
+```bash
+sec-filing-legal-decoder analyze tsla-20251231.htm \
+  --out outputs/tesla-10k-report.md \
+  --json outputs/tesla-10k-report.json \
+  --obsidian-vault ~/Documents/ObsidianVault \
+  --obsidian-folder "SEC Filings/TSLA/2025 10-K" \
+  --company "Tesla, Inc." \
+  --ticker TSLA \
+  --form 10-K \
+  --year 2025
+```
+
+Obsidian export will create a linked note set:
+
+```text
+SEC Filings/TSLA/2025 10-K/
+  00 Dashboard.md
+  01 Executive Summary.md
+  02 Reading Decision Index.md
+  03 Escalation Matrix.md
+  04 Management Memo.md
+  05 Legal-to-Finance Notes.md
+  06 Suggested Questions.md
+  paragraphs/
+    P0001 - legal-proceedings - ESCALATE.md
+  data/
+    report.json
+```
+
+Obsidian export 会生成一组互相链接的 notes：
+
+```text
+SEC Filings/TSLA/2025 10-K/
+  00 Dashboard.md
+  01 Executive Summary.md
+  02 Reading Decision Index.md
+  03 Escalation Matrix.md
+  04 Management Memo.md
+  05 Legal-to-Finance Notes.md
+  06 Suggested Questions.md
+  paragraphs/
+    P0001 - legal-proceedings - ESCALATE.md
+  data/
+    report.json
 ```
 
 分析 Markdown 或 TXT：
@@ -379,6 +441,14 @@ sec-filing-legal-decoder analyze samples/tesla/tsla-10ka.htm \
   --out outputs/tesla-10ka-report.md \
   --json outputs/tesla-10ka-report.json
 
+sec-filing-legal-decoder analyze samples/tesla/tsla-10k.htm \
+  --obsidian-vault ~/Documents/ObsidianVault \
+  --obsidian-folder "SEC Filings/TSLA/2025 10-K" \
+  --company "Tesla, Inc." \
+  --ticker TSLA \
+  --form 10-K \
+  --year 2025
+
 sec-filing-legal-decoder memo samples/tesla/tsla-10ka.htm \
   --out outputs/tesla-10ka-memo.md
 ```
@@ -410,6 +480,14 @@ sec-filing-legal-decoder analyze samples/tesla/tsla-10k.htm \
 sec-filing-legal-decoder analyze samples/tesla/tsla-10ka.htm \
   --out outputs/tesla-10ka-report.md \
   --json outputs/tesla-10ka-report.json
+
+sec-filing-legal-decoder analyze samples/tesla/tsla-10k.htm \
+  --obsidian-vault ~/Documents/ObsidianVault \
+  --obsidian-folder "SEC Filings/TSLA/2025 10-K" \
+  --company "Tesla, Inc." \
+  --ticker TSLA \
+  --form 10-K \
+  --year 2025
 
 sec-filing-legal-decoder memo samples/tesla/tsla-10ka.htm \
   --out outputs/tesla-10ka-memo.md
@@ -454,7 +532,7 @@ src/sec_filing_legal_decoder/
   parser_backends/       # HTML, Markdown, TXT, MinerU CLI, mock parser adapters
   classifiers/           # Rule-based section classification and triage
   crosswalk/             # Finance relevance, reading decisions, questions
-  reports/               # Markdown, JSON, and memo generation
+  reports/               # Markdown, JSON, memo, and Obsidian vault generation
   schemas/               # Dataclass output models
   utils/                 # Text splitting and source references
 skills/
@@ -472,7 +550,7 @@ src/sec_filing_legal_decoder/
   parser_backends/       # HTML、Markdown、TXT、MinerU CLI、mock parser adapters
   classifiers/           # 规则分类和 triage
   crosswalk/             # Finance relevance、reading decisions、questions
-  reports/               # Markdown、JSON、memo 生成
+  reports/               # Markdown、JSON、memo、Obsidian vault 生成
   schemas/               # Dataclass output models
   utils/                 # 文本切分和 source references
 skills/
