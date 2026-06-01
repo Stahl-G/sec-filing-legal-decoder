@@ -13,7 +13,9 @@ from sec_filing_legal_decoder.parser_backends import ParserError, choose_backend
 from sec_filing_legal_decoder.reports import (
     ObsidianExportOptions,
     export_obsidian_vault,
+    render_evidence_audit_report,
     render_escalation_questions_report,
+    render_integrated_legal_risk_review,
     render_json_report,
     render_legal_risk_cards_report,
     render_management_follow_up_report,
@@ -75,10 +77,12 @@ def build_parser() -> argparse.ArgumentParser:
     risk_cards.add_argument(
         "--output-dir",
         type=Path,
-        help="Directory for legal-risk-cards.md/json, escalation-questions.md, and management-follow-up.md.",
+        help="Directory for legal-risk-review.md, legal-risk-cards.md/json, evidence-audit.md, escalation-questions.md, and management-follow-up.md.",
     )
+    risk_cards.add_argument("--review-out", type=Path, help="Integrated legal risk review Markdown output path.")
     risk_cards.add_argument("--questions-out", type=Path, help="Escalation questions Markdown output path.")
     risk_cards.add_argument("--management-follow-up-out", type=Path, help="Management follow-up Markdown output path.")
+    risk_cards.add_argument("--evidence-audit-out", type=Path, help="Evidence audit Markdown output path.")
     risk_cards.add_argument("--obsidian-dir", type=Path, help="Obsidian folder for v0.2 risk-card notes.")
     risk_cards.add_argument("--company", help="Company name for Obsidian frontmatter.")
     risk_cards.add_argument("--ticker", help="Ticker for Obsidian frontmatter.")
@@ -135,8 +139,10 @@ def main(argv: list[str] | None = None) -> int:
                 args.out,
                 args.json,
                 args.output_dir,
+                args.review_out,
                 args.questions_out,
                 args.management_follow_up_out,
+                args.evidence_audit_out,
                 args.obsidian_dir,
                 args.company,
                 args.ticker,
@@ -228,8 +234,10 @@ def _risk_cards(
     markdown_out: Path | None,
     json_out: Path | None,
     output_dir: Path | None,
+    review_out: Path | None,
     questions_out: Path | None,
     management_follow_up_out: Path | None,
+    evidence_audit_out: Path | None,
     obsidian_dir: Path | None,
     company: str | None,
     ticker: str | None,
@@ -240,13 +248,18 @@ def _risk_cards(
     document = backend.parse(input_path)
     report = generate_risk_card_report(document)
 
+    review_markdown = render_integrated_legal_risk_review(report)
     markdown = render_legal_risk_cards_report(report)
     if output_dir is not None:
+        _write_text(output_dir / "legal-risk-review.md", review_markdown)
         _write_text(output_dir / "legal-risk-cards.md", markdown)
         _write_text(output_dir / "legal-risk-cards.json", render_risk_cards_json_report(report))
+        _write_text(output_dir / "evidence-audit.md", render_evidence_audit_report(report))
         _write_text(output_dir / "escalation-questions.md", render_escalation_questions_report(report))
         _write_text(output_dir / "management-follow-up.md", render_management_follow_up_report(report))
 
+    if review_out is not None:
+        _write_text(review_out, review_markdown)
     if markdown_out is not None:
         _write_text(markdown_out, markdown)
     if json_out is not None:
@@ -255,6 +268,8 @@ def _risk_cards(
         _write_text(questions_out, render_escalation_questions_report(report))
     if management_follow_up_out is not None:
         _write_text(management_follow_up_out, render_management_follow_up_report(report))
+    if evidence_audit_out is not None:
+        _write_text(evidence_audit_out, render_evidence_audit_report(report))
     if obsidian_dir is not None:
         export_risk_cards_to_obsidian(
             report,
@@ -269,13 +284,15 @@ def _risk_cards(
 
     if (
         output_dir is None
+        and review_out is None
         and markdown_out is None
         and json_out is None
         and questions_out is None
         and management_follow_up_out is None
+        and evidence_audit_out is None
         and obsidian_dir is None
     ):
-        print(markdown)
+        print(review_markdown)
     return 0
 
 

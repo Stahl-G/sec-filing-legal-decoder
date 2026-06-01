@@ -25,7 +25,7 @@ and material contracts.
 
 ## What This Project Is
 
-- A deterministic v0.2.0 toolkit for legal-to-finance filing triage.
+- A deterministic v0.2.1 toolkit for legal-to-finance filing triage.
 - A risk-card generator that groups source paragraphs into issue-level legal,
   regulatory, governance, audit, disclosure, debt, related-party, dilution, tax,
   cybersecurity, and material-contract cards.
@@ -41,7 +41,7 @@ and material contracts.
 
 ## 这个项目是什么
 
-- 一个 deterministic v0.2.0 工具，用于把 filing 里的法律语言转成 finance reader
+- 一个 deterministic v0.2.1 工具，用于把 filing 里的法律语言转成 finance reader
   能用的 triage 输出。
 - 一个 risk-card generator，可以把 source paragraphs 聚合成事项级 legal、
   regulatory、governance、audit、disclosure、debt、related-party、dilution、
@@ -124,11 +124,15 @@ matter for Legal, Finance, Auditors, IR, Management, or the Board.
 This project helps answer: should this paragraph be skipped, skimmed, read,
 deep-read, or escalated?
 
-In v0.2.0, the preferred output is no longer a long paragraph-by-paragraph
+In v0.2.1, the preferred output is no longer a long paragraph-by-paragraph
 report. The preferred output is a small set of issue-level legal risk cards.
 Each card explains what the filing language may mean, why a finance reader
 should care, which owners should review it, what questions to ask, what not to
 overstate, and which source excerpts support the card.
+
+The first-read file is now `legal-risk-review.md`, an integrated narrative
+review synthesized from the evidence-filtered cards. `legal-risk-cards.md`
+remains available as the card appendix.
 
 ## 为什么不是又一个财务报表阅读器
 
@@ -138,9 +142,12 @@ overstate, and which source excerpts support the card.
 
 这个项目帮助回答：这段话应该跳过、略读、正常读、深读，还是升级处理？
 
-在 v0.2.0 中，首选输出不再是很长的逐段报告，而是一组事项级 legal risk cards。
+在 v0.2.1 中，首选输出不再是很长的逐段报告，而是一组事项级 legal risk cards。
 每张卡会解释 filing 语言可能意味着什么、为什么金融读者需要关心、应该找哪些 owner
 review、该问什么问题、哪些结论不能过度表述，以及支撑这张卡的 source excerpts。
+
+现在第一阅读入口是 `legal-risk-review.md`，它会基于 evidence-filtered cards 生成一份
+连续叙事的 integrated review。`legal-risk-cards.md` 仍作为 card appendix 保留。
 
 ## How MinerU Fits
 
@@ -681,7 +688,7 @@ python evals/run_evals.py
 
 ## CLI Examples
 
-Generate v0.2 legal risk cards. This is the preferred command for agent
+Generate v0.2.1 legal risk review and risk cards. This is the preferred command for agent
 workflows:
 
 ```bash
@@ -699,6 +706,8 @@ The output directory contains:
 ```text
 legal-risk-cards.md
 legal-risk-cards.json
+legal-risk-review.md
+evidence-audit.md
 escalation-questions.md
 management-follow-up.md
 ```
@@ -756,7 +765,7 @@ sec-filing-legal-decoder memo examples/synthetic_internal_control.md --out outpu
 
 ## CLI 示例
 
-生成 v0.2 legal risk cards。Agent workflow 推荐优先使用这个命令：
+生成 v0.2.1 legal risk review 和 risk cards。Agent workflow 推荐优先使用这个命令：
 
 ```bash
 sec-filing-legal-decoder risk-cards tsla-20251231.htm \
@@ -773,6 +782,8 @@ sec-filing-legal-decoder risk-cards tsla-20251231.htm \
 ```text
 legal-risk-cards.md
 legal-risk-cards.json
+legal-risk-review.md
+evidence-audit.md
 escalation-questions.md
 management-follow-up.md
 ```
@@ -948,7 +959,7 @@ sec-filing-legal-decoder memo samples/tesla/tsla-10ka.htm \
 
 ## Output Schema
 
-The v0.2 `risk-cards` JSON output contains:
+The v0.2.1 `risk-cards` JSON output contains:
 
 - `document`
 - `coverage_summary`
@@ -978,6 +989,13 @@ Each risk card contains:
 - `suggested_management_follow_up`
 - `what_not_to_overstate`
 - `source_excerpts`
+- `issuer_specific_facts`
+- `issuer_specific_interpretation`
+- `finance_reader_implication`
+- `evidence_quality`
+- `evidence_summary`
+- `weak_or_suppressed_sources`
+- `recommended_review_posture`
 - `confidence`
 
 The legacy `analyze` command still produces paragraph-level output.
@@ -998,7 +1016,7 @@ Each analyzed paragraph produces:
 
 ## 输出字段
 
-v0.2 `risk-cards` JSON 输出包含：
+v0.2.1 `risk-cards` JSON 输出包含：
 
 - `document`
 - `coverage_summary`
@@ -1028,6 +1046,13 @@ v0.2 `risk-cards` JSON 输出包含：
 - `suggested_management_follow_up`
 - `what_not_to_overstate`
 - `source_excerpts`
+- `issuer_specific_facts`
+- `issuer_specific_interpretation`
+- `finance_reader_implication`
+- `evidence_quality`
+- `evidence_summary`
+- `weak_or_suppressed_sources`
+- `recommended_review_posture`
 - `confidence`
 
 旧版 `analyze` command 仍然生成 paragraph-level output。
@@ -1054,6 +1079,7 @@ src/sec_filing_legal_decoder/
   classifiers/           # Rule-based section classification and triage
   document_modes/        # 10-K, 10-Q, 20-F, 40-F, 6-K, earnings-release detection
   content_routing/       # skip / route-out / analyze paragraph routing
+  evidence/              # evidence filtering, scoring, and fact extraction
   risk_cards/            # v0.2 risk-domain classification and card generation
   overlay/               # compare existing analysis against filing risk cards
   obsidian/              # v0.2 risk-card Obsidian export
@@ -1077,6 +1103,7 @@ src/sec_filing_legal_decoder/
   classifiers/           # 规则分类和 triage
   document_modes/        # 10-K、10-Q、20-F、40-F、6-K、earnings-release 检测
   content_routing/       # skip / route-out / analyze 段落路由
+  evidence/              # evidence filtering、scoring 和 fact extraction
   risk_cards/            # v0.2 risk-domain 分类和 card generation
   overlay/               # 把已有 analysis 和 filing risk cards 做对照
   obsidian/              # v0.2 risk-card Obsidian export
@@ -1107,14 +1134,14 @@ skills/
 - 使用 synthetic examples 或公开 filing excerpts。
 - 所有输出都只是 reading aid，需要专业 review。
 
-## Known Issues In v0.2.0
+## Known Issues In v0.2.1
 
 - Long annual reports can still route a large number of paragraphs into the risk
-  candidate pool. The generator caps output at 12 issue-level cards, but future
-  versions should add better section-aware filtering and source clustering.
-- Some heading-only or table-of-contents labels may still be used as weak source
-  support when they contain risk-domain terms. Treat card excerpts as review
-  anchors, not final evidence.
+  candidate pool. Evidence filtering suppresses taxonomy-like and weak excerpts
+  before the main narrative, but future versions should add better section-aware
+  clustering.
+- Some issuer-specific facts are extracted by deterministic sentence heuristics.
+  They improve the read-through report but still require professional review.
 - Earnings-release `6-K` routing is improved for ordinary revenue, shipment,
   margin, expense, and guidance KPI text, but disclosure/guidance boundaries may
   still need issuer-specific tuning.
@@ -1124,13 +1151,13 @@ skills/
 - HTML extraction preserves visible text but does not yet reconstruct original
   EDGAR section hierarchy, tables, or page locations with full fidelity.
 
-## v0.2.0 已知问题
+## v0.2.1 已知问题
 
-- 很长的年报仍可能把较多段落 route 到 risk candidate pool。当前 generator 最多输出
-  12 张事项级 cards，但后续版本还需要更强的 section-aware filtering 和 source
-  clustering。
-- 某些只有标题或目录性质的文本，如果包含 risk-domain terms，仍可能作为较弱的
-  source support 出现。请把 card excerpts 当作 review anchors，而不是最终证据。
+- 很长的年报仍可能把较多段落 route 到 risk candidate pool。Evidence filtering 会在
+  main narrative 之前压掉 taxonomy-like 和弱证据 excerpts，但后续版本仍需要更强的
+  section-aware clustering。
+- issuer-specific facts 目前由 deterministic sentence heuristics 抽取。它能改善
+  read-through report，但仍需要专业 review。
 - earnings-release `6-K` 对普通 revenue、shipment、margin、expense 和 guidance KPI
   的路由已经改进，但 disclosure/guidance 边界后续仍可能需要按发行人微调。
 - 风险优先级是 deterministic rule-based triage。`Critical`、`High`、`Medium` 是阅读
@@ -1139,6 +1166,15 @@ skills/
   tables 或 page locations。
 
 ## Roadmap
+
+v0.2.1:
+
+- Added `legal-risk-review.md` as the first-read integrated legal risk review
+- Added evidence filtering and evidence quality scoring before report synthesis
+- Added issuer-specific facts, issuer-specific interpretation, finance-reader implication, evidence summary, and review posture to each risk card
+- Added `evidence-audit.md` for debugging accepted and suppressed source excerpts
+- Reduced NVIDIA-style false positives from taxonomy definitions, `warranty` vs `warrant`, `non-affiliates`, and generic settlement/liquidity phrases
+- Obsidian risk-card export now starts with `00 Legal Risk Review.md`
 
 v0.2.0:
 
@@ -1183,6 +1219,15 @@ v0.4:
 - CI-based redaction checks
 
 ## 路线图
+
+v0.2.1:
+
+- 新增 `legal-risk-review.md`，作为第一阅读入口的 integrated legal risk review
+- 在 report synthesis 前新增 evidence filtering 和 evidence quality scoring
+- 每张 risk card 新增 issuer-specific facts、issuer-specific interpretation、finance-reader implication、evidence summary 和 review posture
+- 新增 `evidence-audit.md`，用于调试 accepted / suppressed source excerpts
+- 降低 NVIDIA 样本暴露出的 taxonomy definitions、`warranty` vs `warrant`、`non-affiliates`、generic settlement/liquidity phrases 等误报
+- Obsidian risk-card export 现在以 `00 Legal Risk Review.md` 开始
 
 v0.2.0:
 

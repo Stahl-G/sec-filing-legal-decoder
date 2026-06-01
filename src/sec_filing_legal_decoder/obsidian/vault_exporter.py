@@ -8,6 +8,7 @@ from pathlib import Path
 
 from sec_filing_legal_decoder.reports import (
     render_escalation_questions_report,
+    render_integrated_legal_risk_review,
     render_management_follow_up_report,
     render_risk_cards_json_report,
 )
@@ -40,9 +41,10 @@ def export_risk_cards_to_obsidian(
     context = _context(report, options)
     card_files = {card.card_id: _card_file_name(card) for card in report.risk_cards}
     payloads = {
-        base_dir / "00 Legal Risk Dashboard.md": _dashboard(report, context, card_files),
-        base_dir / "01 Escalation Matrix.md": render_escalation_questions_report(report),
-        base_dir / "02 Management Follow-up.md": render_management_follow_up_report(report),
+        base_dir / "00 Legal Risk Review.md": render_integrated_legal_risk_review(report),
+        base_dir / "01 Legal Risk Dashboard.md": _dashboard(report, context, card_files),
+        base_dir / "02 Escalation Matrix.md": render_escalation_questions_report(report),
+        base_dir / "03 Management Follow-up.md": render_management_follow_up_report(report),
         data_dir / "legal-risk-cards.json": render_risk_cards_json_report(report),
     }
     written: list[Path] = []
@@ -81,8 +83,9 @@ def _dashboard(
         "",
         "## Key Outputs",
         "",
-        "- [[01 Escalation Matrix]]",
-        "- [[02 Management Follow-up]]",
+        "- [[00 Legal Risk Review]]",
+        "- [[02 Escalation Matrix]]",
+        "- [[03 Management Follow-up]]",
         "- [[data/legal-risk-cards.json|Structured JSON Archive]]",
         "",
         "## Filing Metadata",
@@ -131,6 +134,8 @@ def _card_note(card: RiskCard, context: dict[str, str]) -> str:
         f"priority: {card.priority}",
         f"reading_decision: {card.reading_decision}",
         f"confidence: {card.confidence:.2f}",
+        f"evidence_quality: {card.evidence_quality}",
+        f"review_posture: {card.recommended_review_posture}",
         "owners:",
         *[f"  - {owner}" for owner in card.owners],
         "tags:",
@@ -147,6 +152,19 @@ def _card_note(card: RiskCard, context: dict[str, str]) -> str:
         "",
         f"> [!{_callout(card.priority)}] {card.priority} / {card.reading_decision}",
         f"> Risk domain: `{card.risk_domain}`",
+        f"> Evidence quality: `{card.evidence_quality}`",
+        "",
+        "## Issuer-Specific Interpretation",
+        "",
+        card.issuer_specific_interpretation or card.plain_language_meaning,
+        "",
+        "## Finance-Reader Implication",
+        "",
+        card.finance_reader_implication or card.why_finance_readers_should_care,
+        "",
+        "## What The Filing Says",
+        "",
+        *([f"- {fact}" for fact in card.issuer_specific_facts] or ["- No concise issuer-specific facts were extracted."]),
         "",
         "## Plain-Language Meaning",
         "",
@@ -194,7 +212,7 @@ def _card_note(card: RiskCard, context: dict[str, str]) -> str:
     for excerpt in card.source_excerpts:
         lines.extend(
             [
-                f"> [!quote] P{excerpt.paragraph_id:04d} `{excerpt.source_ref}`",
+                f"> [!quote] P{excerpt.paragraph_id:04d} `{excerpt.source_ref}` / evidence `{excerpt.evidence_quality}`",
                 f"> {excerpt.excerpt}",
                 "",
             ]

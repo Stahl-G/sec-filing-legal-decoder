@@ -7,8 +7,8 @@ documents.
 ## What To Do
 
 1. Prefer the EDGAR main `.htm/.html` filing document when available.
-2. Use `sec-filing-legal-decoder risk-cards` for the preferred v0.2 workflow:
-   issue-level legal risk cards for finance readers.
+2. Use `sec-filing-legal-decoder risk-cards` for the preferred v0.2.1 workflow:
+   an integrated `legal-risk-review.md` plus issue-level legal risk cards.
 3. Use `sec-filing-legal-decoder review-overlay` when the user has an existing
    finance or earnings analysis and wants legal/governance/disclosure gaps.
 4. Use `sec-filing-legal-decoder analyze` only when the user specifically wants
@@ -21,8 +21,10 @@ documents.
    controls, debt covenants, related-party transactions, guarantees,
    commitments, dilution, tax, cybersecurity governance, disclosure consistency,
    and material contracts.
-8. Summarize outputs as risk cards, escalation questions, management follow-up,
-   and what-not-to-overstate cautions.
+8. Read `legal-risk-review.md` first, then use `legal-risk-cards.md` and
+   `evidence-audit.md` as appendices for card and source-evidence details.
+9. Summarize outputs as issuer-specific legal risk themes, escalation questions,
+   management follow-up, and what-not-to-overstate cautions.
 
 ## Guardrails
 

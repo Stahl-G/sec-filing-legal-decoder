@@ -51,7 +51,7 @@ RISK_DOMAIN_PATTERNS: dict[str, tuple[str, ...]] = {
     ),
     "related_party_governance": (
         r"related[- ]part",
-        r"affiliate",
+        r"(?<!non-)affiliate",
         r"common control",
         r"controlling shareholder",
         r"director .* interest",
@@ -88,7 +88,7 @@ RISK_DOMAIN_PATTERNS: dict[str, tuple[str, ...]] = {
     ),
     "equity_dilution_control": (
         r"dilution",
-        r"warrants?",
+        r"\bwarrants?\b",
         r"convertible notes?",
         r"earnout",
         r"\bpipe\b",
@@ -165,7 +165,7 @@ SUBDOMAIN_PATTERNS: dict[str, tuple[tuple[str, str], ...]] = {
     ),
     "equity_dilution_control": (
         ("earnout_shares", r"earnout"),
-        ("warrants", r"warrants?"),
+        ("warrants", r"\bwarrants?\b"),
         ("convertible_notes", r"convertible notes?"),
         ("RSU", r"\brsu\b|restricted stock units?"),
         ("PIPE", r"\bpipe\b"),
@@ -187,7 +187,7 @@ SUBDOMAIN_PATTERNS: dict[str, tuple[tuple[str, str], ...]] = {
     ),
     "related_party_governance": (
         ("related_party_transactions", r"related[- ]part"),
-        ("affiliate_transactions", r"affiliate"),
+        ("affiliate_transactions", r"(?<!non-)affiliate"),
         ("control_conflict", r"common control|controlling shareholder|director .* interest"),
         ("VIE", r"variable interest entit|\bvie\b"),
     ),

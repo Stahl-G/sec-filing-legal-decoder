@@ -102,9 +102,10 @@ def test_risk_card_obsidian_export_writes_cards(tmp_path: Path):
     )
 
     base = tmp_path / "obsidian"
-    assert base.joinpath("00 Legal Risk Dashboard.md").exists()
-    assert base.joinpath("01 Escalation Matrix.md").exists()
-    assert base.joinpath("02 Management Follow-up.md").exists()
+    assert base.joinpath("00 Legal Risk Review.md").exists()
+    assert base.joinpath("01 Legal Risk Dashboard.md").exists()
+    assert base.joinpath("02 Escalation Matrix.md").exists()
+    assert base.joinpath("03 Management Follow-up.md").exists()
     assert base.joinpath("cards").is_dir()
     assert base.joinpath("data", "legal-risk-cards.json").exists()
     assert written
@@ -112,4 +113,6 @@ def test_risk_card_obsidian_export_writes_cards(tmp_path: Path):
     card_text = next(base.joinpath("cards").glob("*.md")).read_text(encoding="utf-8")
     assert "risk_domain:" in card_text
     assert "priority:" in card_text
+    assert "evidence_quality:" in card_text
+    assert "## Issuer-Specific Interpretation" in card_text
     assert "## Source Excerpts" in card_text

@@ -96,6 +96,8 @@ class SourceExcerpt:
     paragraph_id: int
     source_ref: str
     excerpt: str
+    evidence_quality: str = "medium"
+    evidence_notes: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -121,6 +123,13 @@ class RiskCard:
     what_not_to_overstate: str
     source_excerpts: list[SourceExcerpt]
     confidence: float
+    issuer_specific_facts: list[str] = field(default_factory=list)
+    issuer_specific_interpretation: str = ""
+    finance_reader_implication: str = ""
+    evidence_quality: str = "medium"
+    evidence_summary: str = ""
+    weak_or_suppressed_sources: list[SourceExcerpt] = field(default_factory=list)
+    recommended_review_posture: str = "appendix"
 
 
 @dataclass(frozen=True)

@@ -71,6 +71,10 @@ def priority_for(domain: str, text: str, paragraph_count: int) -> str:
         priority = "Critical"
     if domain == "legal_proceedings_litigation" and re.search(r"subpoena|investigation|section\s+337|\bptab\b", lowered):
         priority = _max_priority(priority, "High")
+    if domain in {"material_contracts", "guarantees_commitments", "equity_dilution_control"} and re.search(
+        r"\$[\d,.]+\s*(?:million|billion)", text, flags=re.IGNORECASE
+    ):
+        priority = _max_priority(priority, "High")
     if domain == "disclosure_ir_consistency" and not _has_any(lowered, ESCALATION_TERMS):
         priority = _max_priority("Low", priority)
     if paragraph_count >= 4:
