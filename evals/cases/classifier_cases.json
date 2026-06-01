@@ -1,0 +1,27 @@
+[
+  {
+    "name": "generic legal proceedings risk",
+    "text": "The company may from time to time become involved in claims or litigation that could adversely affect results.",
+    "expected_section_type": "legal_proceedings"
+  },
+  {
+    "name": "actual investigation wording",
+    "text": "The company received a subpoena from the SEC related to revenue recognition and is cooperating with the investigation.",
+    "expected_section_type": "legal_proceedings"
+  },
+  {
+    "name": "internal control material weakness",
+    "text": "Management identified a material weakness in internal control over financial reporting.",
+    "expected_section_type": "internal_control"
+  },
+  {
+    "name": "debt covenant default risk",
+    "text": "The company was not in compliance with a debt covenant and obtained a waiver after year-end.",
+    "expected_section_type": "debt_covenant_default"
+  },
+  {
+    "name": "related party transaction",
+    "text": "The company purchased services from a related-party affiliate controlled by a director.",
+    "expected_section_type": "related_party_transaction"
+  }
+]

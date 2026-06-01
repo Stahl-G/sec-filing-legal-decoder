@@ -1,0 +1,17 @@
+[
+  {
+    "name": "debt covenant finance mapping",
+    "section_type": "debt_covenant_default",
+    "expected_terms": ["liquidity", "covenant", "classification"]
+  },
+  {
+    "name": "related party finance mapping",
+    "section_type": "related_party_transaction",
+    "expected_terms": ["pricing", "balances", "approval"]
+  },
+  {
+    "name": "guarantee finance mapping",
+    "section_type": "guarantee_commitment",
+    "expected_terms": ["maximum exposure", "cash", "contingent"]
+  }
+]

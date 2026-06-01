@@ -1,0 +1,26 @@
+[
+  {
+    "name": "boilerplate legal risk",
+    "section_type": "legal_proceedings",
+    "text": "The company may from time to time become involved in claims that could adversely affect the business.",
+    "expected_reading_decision": "SKIM"
+  },
+  {
+    "name": "actual SEC subpoena",
+    "section_type": "legal_proceedings",
+    "text": "The company received a subpoena from the SEC and has accrued a liability of $4.2 million.",
+    "expected_reading_decision": "ESCALATE"
+  },
+  {
+    "name": "material weakness",
+    "section_type": "internal_control",
+    "text": "Management concluded internal control was ineffective due to a material weakness.",
+    "expected_reading_decision": "ESCALATE"
+  },
+  {
+    "name": "unknown read",
+    "section_type": "unknown",
+    "text": "The paragraph discusses an operational update without clear legal-heavy filing indicators.",
+    "expected_reading_decision": "READ"
+  }
+]

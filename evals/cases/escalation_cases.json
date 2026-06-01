@@ -1,0 +1,16 @@
+[
+  {
+    "name": "legal proceedings asks legal finance auditor",
+    "section_type": "legal_proceedings",
+    "reading_decision": "ESCALATE",
+    "signals": ["received_notice", "named_regulator"],
+    "expected_roles": ["Ask Legal", "Ask Finance", "Ask Auditor"]
+  },
+  {
+    "name": "internal control asks auditor",
+    "section_type": "internal_control",
+    "reading_decision": "ESCALATE",
+    "signals": ["material_weakness"],
+    "expected_roles": ["Ask Finance", "Ask Auditor", "Ask Management / Board"]
+  }
+]
