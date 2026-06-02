@@ -14,7 +14,8 @@ SEC Filing Legal Decoder 是一个 AI agent skill 和 Python CLI，用于把 SEC
 
 ## What This Project Is
 
-- A deterministic `v0.4.0` source-only review workflow.
+- A deterministic `v0.4.1` source-only review workflow with an agent-readable
+  skill wrapper.
 - A legal-to-finance decoder for legal proceedings, internal controls,
   regulatory risk, related-party transactions, debt covenants, guarantees,
   commitments, dilution, tax, cybersecurity governance, disclosure consistency,
@@ -27,7 +28,8 @@ SEC Filing Legal Decoder 是一个 AI agent skill 和 Python CLI，用于把 SEC
 
 ## 这个项目是什么
 
-- 一个 deterministic `v0.4.0` source-only review workflow。
+- 一个 deterministic `v0.4.1` source-only review workflow，并带有 agent-readable
+  skill wrapper。
 - 一个 legal-to-finance decoder，覆盖法律诉讼、内控、监管、关联交易、债务
   covenant、担保、承诺事项、股权稀释、税务、网络安全治理、披露一致性和重大合同。
 - 一个 risk-card generator，把原文段落合并成事项级风险主题。
@@ -42,7 +44,7 @@ SEC Filing Legal Decoder 是一个 AI agent skill 和 Python CLI，用于把 SEC
 - Not a generic financial statement reader.
 - Not a PDF parser and not a MinerU wrapper.
 - Not a disclosure conclusion engine.
-- Not an external enrichment tool. `v0.4.0` does not add web, news, analyst, or
+- Not an external enrichment tool. `v0.4.1` does not add web, news, analyst, or
   database context to the filing.
 
 ## 这个项目不是什么
@@ -51,7 +53,7 @@ SEC Filing Legal Decoder 是一个 AI agent skill 和 Python CLI，用于把 SEC
 - 不是通用财务报表阅读器。
 - 不是 PDF parser，也不是 MinerU 套壳。
 - 不是披露结论引擎。
-- 不是外部信息增强工具。`v0.4.0` 不会把网页、新闻、卖方报告或数据库信息混入 filing。
+- 不是外部信息增强工具。`v0.4.1` 不会把网页、新闻、卖方报告或数据库信息混入 filing。
 
 ## SEC Filing Source Priority
 
@@ -125,6 +127,67 @@ local virtual environment, run the smoke test, then analyze my SEC filing main
 .htm/.html file with sec-filing-legal-decoder risk-cards. Use source-only mode.
 Read legal-risk-review.md first, then use legal-risk-cards.md and
 evidence-audit.md as supporting appendices.
+```
+
+## Use as an Agent Skill
+
+The Python CLI is the execution layer. The agent-readable entrypoint is
+`skills/sec-filing-legal-decoder/SKILL.md`, which tells coding agents when to
+use this project, how to run the CLI, which outputs to read first, and which
+safety boundaries to preserve.
+
+This is not a legal advice plugin. It is source-only first, keeps the filing as
+the evidence boundary, and supports Chinese bilingual legal-to-finance review.
+
+Basic command:
+
+```bash
+sec-filing-legal-decoder risk-cards input.htm \
+  --output-dir outputs/sample-risk-review
+```
+
+Chinese bilingual command:
+
+```bash
+sec-filing-legal-decoder risk-cards input.htm \
+  --lang zh-CN \
+  --output-dir outputs/sample-risk-review-zh
+```
+
+Validate the skill package:
+
+```bash
+python skills/sec-filing-legal-decoder/scripts/validate_skill_structure.py
+```
+
+## 作为 Agent Skill 使用
+
+Python CLI 是执行层。Agent-readable 入口是
+`skills/sec-filing-legal-decoder/SKILL.md`，它会告诉 coding agent 什么时候使用本项目、
+如何运行 CLI、先读哪些输出文件，以及必须遵守哪些安全边界。
+
+这不是法律意见插件。它优先采用 source-only review，把 filing 本身作为证据边界，
+并支持中文双语 legal-to-finance review。
+
+基础命令：
+
+```bash
+sec-filing-legal-decoder risk-cards input.htm \
+  --output-dir outputs/sample-risk-review
+```
+
+中文双语命令：
+
+```bash
+sec-filing-legal-decoder risk-cards input.htm \
+  --lang zh-CN \
+  --output-dir outputs/sample-risk-review-zh
+```
+
+校验 skill package：
+
+```bash
+python skills/sec-filing-legal-decoder/scripts/validate_skill_structure.py
 ```
 
 ## Installation Guide For Beginners
@@ -259,7 +322,7 @@ sec-filing-legal-decoder risk-cards filing.htm \
 
 ## Issuer Profiles
 
-`v0.4.0` adds issuer profiles for under-covered issuer review. Profiles adjust
+`v0.4.1` includes issuer profiles for under-covered issuer review. Profiles adjust
 priority only when the filing text supports that risk.
 
 Supported profiles:
@@ -273,7 +336,7 @@ Supported profiles:
 
 ## Issuer profile
 
-`v0.4.0` 新增 issuer profile，适合 under-covered issuer review。Profile 只在
+`v0.4.1` 包含 issuer profile，适合 under-covered issuer review。Profile 只在
 filing 原文支持相应风险时调整优先级。
 
 支持：

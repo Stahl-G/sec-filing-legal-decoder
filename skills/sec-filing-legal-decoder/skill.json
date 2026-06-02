@@ -1,9 +1,11 @@
 {
   "name": "sec-filing-legal-decoder",
   "title": "SEC Filing Legal Decoder",
-  "description": "AI agent skill and CLI for turning legal-heavy SEC filing sections into finance-readable legal risk reviews, risk cards, and escalation questions.",
-  "version": "0.4.0",
+  "description": "Agent-readable skill and CLI wrapper for source-only legal-to-finance review of SEC filings, generating finance-readable legal risk cards, escalation questions, management follow-up notes, and Chinese bilingual review outputs.",
+  "version": "0.4.1",
   "entrypoint": "sec-filing-legal-decoder",
+  "primary_command": "sec-filing-legal-decoder risk-cards",
+  "default_review_mode": "source-only",
   "tags": [
     "sec-filings",
     "10-k",
@@ -15,6 +17,8 @@
     "ai-agent",
     "risk-triage",
     "legal-to-finance",
-    "obsidian"
+    "source-only",
+    "obsidian",
+    "zh-cn"
   ]
 }

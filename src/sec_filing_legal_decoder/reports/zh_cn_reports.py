@@ -583,7 +583,7 @@ def _frontmatter(report: RiskCardReport, title_prefix: str, note_type: str) -> l
         "  - sec-filing",
         "  - legal-risk",
         "  - zh-CN",
-        "  - sec-filing-legal-decoder/v0.4.0",
+        "  - sec-filing-legal-decoder/v0.4.1",
         f"note_type: {note_type}",
         f'form_type: "{_yaml_escape(report.document.form_type)}"',
         f'document_mode: "{_yaml_escape(report.document.mode)}"',

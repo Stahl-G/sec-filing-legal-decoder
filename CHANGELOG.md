@@ -2,6 +2,21 @@
 
 All notable changes to `sec-filing-legal-decoder` are documented here.
 
+## 0.4.1
+
+### Added
+- Anthropic-style / agent-readable `SKILL.md` frontmatter.
+- Skill references for source priority, output contract, source-only review, privacy guardrails, and zh-CN legal style.
+- Synthetic agent prompt examples.
+- Skill validation and smoke-test scripts.
+
+### Changed
+- Clarified skill trigger description and primary risk-card workflow.
+- Kept Python CLI as the core execution layer and skill wrapper as the agent entrypoint.
+
+### Security / Privacy
+- Reinforced no-private-company, no-internal-filing, no-MNPI rule for skill files, examples, tests, and generated outputs.
+
 ## 0.4.0
 
 ### Added

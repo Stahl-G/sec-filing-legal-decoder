@@ -10,6 +10,7 @@ fi
 pytest
 "${PYTHON_BIN}" evals/run_evals.py
 "${PYTHON_BIN}" scripts/check_sensitive_terms.py
+"${PYTHON_BIN}" skills/sec-filing-legal-decoder/scripts/validate_skill_structure.py
 if command -v sec-filing-legal-decoder >/dev/null 2>&1; then
   sec-filing-legal-decoder --version
 elif command -v python3 >/dev/null 2>&1; then
