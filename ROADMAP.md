@@ -73,11 +73,14 @@ Recommended GitHub Project fields:
 
 | Field | Values |
 | --- | --- |
-| Status | Backlog, Ready, In Progress, In Review, Blocked, Done |
-| Milestone | 0.4.0, 0.4.1, 0.5.0, 0.6.0, Future |
+| Status | Todo, In Progress, Done |
+| Milestone | 0.4.0, 0.4.1, 0.4.2, 0.5.0, 0.6.0, Future |
 | Type | Feature, Refactor, Docs, Test, Eval, Security / Privacy, Release, Agent Skill |
 | Priority | P0, P1, P2, P3 |
 | Area | CLI, Risk Engine, Issues, Reports, Chinese Output, Docs, Skill, Privacy, Tests, Evals, Examples, Release |
+
+Project convention: use `Todo` for planned `Ready` / `Backlog` work, `In
+Progress` for active implementation, and `Done` for released or closed items.
 
 ## Milestones
 
@@ -123,9 +126,73 @@ Delivered:
 - Output validation script.
 - README section for using the project as an agent skill.
 
-### 0.5.0 — Issue-First Report And Functional Action Planner
+### 0.4.2 — Pre-0.5 Quality Baseline
 
 Status: Ready
+
+Goal: add quality baselines before the issue-first refactor. This is a bridge
+release and should not change core product behavior.
+
+Purpose:
+
+- Create golden synthetic fixtures for 0.5 regression testing.
+- Define product-quality scoring before report structure changes.
+- Lock compatibility expectations for existing risk-card outputs and new issue
+  outputs.
+- Clarify terminology before introducing `RiskIssue`.
+
+Planned fixtures:
+
+```text
+synthetic_small_fpi_20f.htm
+synthetic_spac_despace_20f.htm
+synthetic_manufacturing_10k.htm
+synthetic_policy_reliance_20f.htm
+synthetic_tax_dta_10k.htm
+synthetic_litigation_contingency_10k.htm
+```
+
+Each fixture should define:
+
+- Expected risk domains.
+- Expected issue titles.
+- Expected owners.
+- Expected do-not-overstate cautions.
+- Expected action artifacts.
+
+Product-quality checks:
+
+- `main_report_has_executive_thesis`
+- `issue_count_between_3_and_6`
+- `no_issue_title_is_raw_domain_name`
+- `each_issue_has_one_sentence_conclusion`
+- `each_issue_has_source_facts`
+- `each_issue_has_owner_actions`
+- `each_issue_has_do_not_overstate`
+- `main_report_excerpt_ratio_under_25_percent`
+- `functional_action_plan_has_output_artifacts`
+
+Compatibility contract:
+
+```json
+{
+  "risk_cards": [],
+  "issues": [],
+  "functional_action_plan": {},
+  "evidence_appendix": []
+}
+```
+
+Terminology:
+
+- Risk domain: backend classification label.
+- Risk card: evidence-backed legal-to-finance note grouped by domain.
+- Risk issue: controversy-based decision object synthesized from one or more
+  risk cards.
+
+### 0.5.0 — Issue-First Report And Functional Action Planner
+
+Status: Ready after 0.4.2 baseline
 
 Goal: upgrade from risk-card reading summary to issue-first decision support.
 
@@ -144,6 +211,11 @@ cross-functional action plan
 
 Principle: risk cards are backend evidence and taxonomy objects. Issues are
 frontend decision-making objects.
+
+Quality principle: a good issue is not a raw risk domain. A good issue states a
+controversy, connects source facts to legal / finance / IR implications,
+recommends concrete action artifacts, preserves evidence traceability, and
+includes do-not-overstate cautions.
 
 Planned report structure:
 
@@ -218,6 +290,18 @@ src/sec_filing_legal_decoder/issues/
   controversy_rules.py
 ```
 
+Issue templates should be added before renderers so English, zh-CN, Obsidian,
+and overlay outputs can reuse the same deterministic issue logic.
+
+Planned template families:
+
+- `CommitmentDownsideExposureTemplate`
+- `TaxSustainabilityTemplate`
+- `LitigationContingencyTemplate`
+- `PolicyRelianceTemplate`
+- `GoingConcernMitigationTemplate`
+- `RelatedPartyDependenceTemplate`
+
 Planned issue types:
 
 - Supply and capacity commitments: growth infrastructure or downside exposure?
@@ -235,6 +319,11 @@ Functional action plan categories:
 - Remediation / Contingency Planning
 - Disclosure / IR Alignment
 
+Default action language should use "prepare / verify / model / preserve /
+review / confirm" framing. Avoid unsupported directives such as terminate the
+contract, sue an agency, recognize a liability, disclose immediately, or
+conclude violation unless the filing explicitly supports that statement.
+
 Recommended output artifacts:
 
 - Commitment exposure schedule.
@@ -245,6 +334,21 @@ Recommended output artifacts:
 - Policy reliance dossier.
 - Board approval evidence pack.
 - Scenario sensitivity model.
+
+Issue JSON should include structured required outputs, not only prose action
+items:
+
+```json
+{
+  "required_outputs": [
+    {
+      "artifact": "DTA realizability support memo",
+      "owner": "Finance / Auditor",
+      "purpose": "Support more-likely-than-not realization assumptions"
+    }
+  ]
+}
+```
 
 Compatibility requirement: keep existing outputs:
 
@@ -278,6 +382,11 @@ Acceptance criteria:
 - Every issue has do-not-overstate cautions.
 - Long excerpts move to the appendix.
 - Existing risk-card outputs still exist.
+- Every issue traces to at least one related risk card or source fact.
+- Every issue includes source paragraph IDs or source facts.
+- Issue titles do not equal raw domain titles.
+- Main report source excerpt ratio stays under 25%.
+- Functional action plan recommends output artifacts.
 - Tests pass.
 
 ### 0.6.0 — Evidence Retrieval / RAG-Ready Store
@@ -333,19 +442,144 @@ Out of scope before issue-first reports are stable:
 
 | Title | Milestone | Type | Area | Priority | Status |
 | --- | --- | --- | --- | --- | --- |
-| Add issue synthesis schema | 0.5.0 | Feature | Issues | P1 | Ready |
-| Add issue-first `legal-risk-review.md` | 0.5.0 | Refactor | Reports | P1 | Ready |
-| Add functional action planner | 0.5.0 | Feature | Issues | P2 | Ready |
-| Add issue-first zh-CN renderer | 0.5.0 | Feature | Chinese Output | P2 | Ready |
+| Add golden synthetic fixtures before issue-first refactor | 0.4.2 | Eval | Evals | P0 | Ready |
+| Add product-quality scoring before v0.5 | 0.4.2 | Eval | Evals | P0 | Ready |
+| Add backward compatibility contract for issue outputs | 0.4.2 | Docs | Reports | P0 | Ready |
+| Clarify terminology: domain vs card vs issue | 0.4.2 | Docs | Docs | P2 | Ready |
+| Add issue synthesis schema | 0.5.0 | Feature | Issues | P1 | Ready after 0.4.2 |
+| Add issue-first `legal-risk-review.md` | 0.5.0 | Refactor | Reports | P1 | Ready after 0.4.2 |
+| Add functional action planner | 0.5.0 | Feature | Issues | P2 | Ready after 0.4.2 |
+| Add issue-first zh-CN renderer | 0.5.0 | Feature | Chinese Output | P2 | Ready after 0.4.2 |
+| Define issue quality rubric for v0.5 issue-first reports | 0.5.0 | Eval | Issues | P0 | Ready after 0.4.2 |
+| Add risk-card-to-issue traceability | 0.5.0 | Feature | Issues | P0 | Ready after 0.4.2 |
+| Add anti-overclaim rules for action planner | 0.5.0 | Security / Privacy | Issues | P0 | Ready after 0.4.2 |
+| Add issue templates before report renderer | 0.5.0 | Feature | Issues | P1 | Ready after 0.4.2 |
+| Add required artifact generator | 0.5.0 | Feature | Issues | P1 | Ready after 0.4.2 |
+| Update review-overlay to compare against issues | 0.5.0 | Refactor | Reports | P1 | Ready after 0.4.2 |
+| Update Obsidian export from card notes to issue notes | 0.5.0 | Feature | Reports | P1 | Ready after 0.4.2 |
+| Add zh-CN issue-first action verb style guide | 0.5.0 | Refactor | Chinese Output | P2 | Ready after 0.4.2 |
+| Add issue count and excerpt-ratio readability tests | 0.5.0 | Test | Reports | P2 | Ready after 0.4.2 |
 | Add RAG-ready EvidenceStore | 0.6.0 | Feature | Risk Engine | P3 | Backlog |
+
+## 0.4.2 Issue Breakdown
+
+### P0 — Add Golden Synthetic Fixtures Before Issue-First Refactor
+
+Type: Eval
+Milestone: 0.4.2
+Area: Evals
+Priority: P0
+
+Tasks:
+
+- Add synthetic policy-reliance 20-F fixture.
+- Add synthetic tax / DTA 10-K fixture.
+- Add synthetic litigation contingency 10-K fixture.
+- Keep existing small FPI / de-SPAC / manufacturing fixtures in the baseline.
+- Define expected risk domains, issue titles, owners, cautions, and action
+  artifacts.
+
+### P0 — Add Product-Quality Scoring Before v0.5
+
+Type: Eval
+Milestone: 0.4.2
+Area: Evals
+Priority: P0
+
+Tasks:
+
+- Add executive-thesis check.
+- Add issue-count range check.
+- Add raw-domain-title rejection.
+- Add source-facts / owner-actions / do-not-overstate checks.
+- Add excerpt-ratio threshold.
+- Add functional-action-plan output-artifact check.
+
+### P0 — Add Backward Compatibility Contract For Issue Outputs
+
+Type: Docs
+Milestone: 0.4.2
+Area: Reports
+Priority: P0
+
+Tasks:
+
+- Document whether issues live in `legal-risk-cards.json` or
+  `legal-risk-review.json`.
+- Define top-level JSON fields for `issues`, `functional_action_plan`, and
+  `evidence_appendix`.
+- Preserve existing risk-card output files.
+- Document new `legal-risk-issues.md` and `functional-action-plan.md` outputs.
+
+### P2 — Clarify Terminology: Domain vs Card vs Issue
+
+Type: Docs
+Milestone: 0.4.2
+Area: Docs
+Priority: P2
+
+Tasks:
+
+- Define risk domain.
+- Define risk card.
+- Define risk issue.
+- Update roadmap and docs before issue-first implementation.
 
 ## 0.5.0 Issue Breakdown
 
+### P0 — Define Issue Quality Rubric For v0.5 Issue-First Reports
+
+Type: Eval
+Milestone: 0.5.0
+Area: Issues
+Priority: P0
+
+Tasks:
+
+- Document that a good issue is not a raw risk domain.
+- Require each issue to state a controversy.
+- Require source facts connected to legal / finance / IR implications.
+- Require action artifacts.
+- Require do-not-overstate cautions.
+- Add good and bad synthetic examples.
+
+### P0 — Add Risk-Card-To-Issue Traceability
+
+Type: Feature
+Milestone: 0.5.0
+Area: Issues
+Priority: P0
+
+Tasks:
+
+- Require `related_card_ids` on every issue.
+- Require `risk_domains` on every issue.
+- Require source paragraph IDs or source facts.
+- Carry evidence quality into issue synthesis.
+- Expose weak or suppressed evidence notes when relevant.
+
+### P0 — Add Anti-Overclaim Rules For Action Planner
+
+Type: Security / Privacy
+Milestone: 0.5.0
+Area: Issues
+Priority: P0
+
+Tasks:
+
+- Allow actions such as prepare support memo, build exposure schedule, preserve
+  board materials, quantify scenarios, review disclosure consistency, and
+  confirm with owners.
+- Block unsupported actions such as terminate contract, sue agency, recognize
+  liability, disclose immediately, or conclude violation.
+- Add tests for forbidden action verbs and conclusions.
+- Keep do-not-overstate cautions on every issue.
+
 ### P1 — Add Issue Synthesis Schema
 
-Type: Feature  
-Milestone: 0.5.0  
-Area: Issues  
+Type: Feature
+Milestone: 0.5.0
+Area: Issues
 Priority: P1
 
 Tasks:
@@ -356,11 +590,45 @@ Tasks:
 - Add basic deterministic issue generator.
 - Add tests for issue creation from existing risk cards.
 
+### P1 — Add Issue Templates Before Report Renderer
+
+Type: Feature
+Milestone: 0.5.0
+Area: Issues
+Priority: P1
+
+Tasks:
+
+- Add `CommitmentDownsideExposureTemplate`.
+- Add `TaxSustainabilityTemplate`.
+- Add `LitigationContingencyTemplate`.
+- Add `PolicyRelianceTemplate`.
+- Add `GoingConcernMitigationTemplate`.
+- Add `RelatedPartyDependenceTemplate`.
+- Define default actions, do-not-overstate cautions, and required artifacts per
+  template.
+
+### P1 — Add Required Artifact Generator
+
+Type: Feature
+Milestone: 0.5.0
+Area: Issues
+Priority: P1
+
+Tasks:
+
+- Add `required_outputs` field to issue or action-plan output.
+- Support artifact, owner, and purpose fields.
+- Generate commitment exposure schedules, tax benefit bridges, DTA support
+  memos, litigation trackers, disclosure consistency memos, policy reliance
+  dossiers, board approval evidence packs, and scenario sensitivity models when
+  supported.
+
 ### P1 — Add Issue-First `legal-risk-review.md`
 
-Type: Refactor  
-Milestone: 0.5.0  
-Area: Reports  
+Type: Refactor
+Milestone: 0.5.0
+Area: Reports
 Priority: P1
 
 Tasks:
@@ -372,11 +640,43 @@ Tasks:
 - Add Evidence Appendix.
 - Keep old risk-card files.
 
+### P1 — Update Review-Overlay To Compare Against Issues
+
+Type: Refactor
+Milestone: 0.5.0
+Area: Reports
+Priority: P1
+
+Tasks:
+
+- Compare existing financial analysis against issue thesis and controversy map.
+- Add `covered_issues`.
+- Add `under_explained_issues`.
+- Add `misframed_issues`.
+- Add `overstated_financial_claims`.
+- Add `missing_action_items`.
+
+### P1 — Update Obsidian Export From Card Notes To Issue Notes
+
+Type: Feature
+Milestone: 0.5.0
+Area: Reports
+Priority: P1
+
+Tasks:
+
+- Add `00 Executive Risk Thesis.md`.
+- Add `01 Controversy Map.md`.
+- Add `issues/ISSUE-*.md` notes.
+- Keep `cards/RC-*.md` notes.
+- Add `evidence/Evidence Appendix.md`.
+- Link issues to cards and evidence paragraphs.
+
 ### P2 — Add Functional Action Planner
 
-Type: Feature  
-Milestone: 0.5.0  
-Area: Issues  
+Type: Feature
+Milestone: 0.5.0
+Area: Issues
 Priority: P2
 
 Tasks:
@@ -388,11 +688,27 @@ Tasks:
 - Add owner-based aggregation.
 - Add output artifact recommendations.
 
+### P2 — Add zh-CN Issue-First Action Verb Style Guide
+
+Type: Refactor
+Milestone: 0.5.0
+Area: Chinese Output
+Priority: P2
+
+Tasks:
+
+- Prefer cautious verbs: 核查, 量化, 建立台账, 形成支持 memo, 保留证据,
+  拆分一次性 / 经常性影响, 准备情景分析, 校准披露口径, 提交管理层复核.
+- Avoid overclaim verbs: 认定, 判定违法, 确认责任, 立即披露, 确认负债,
+  unless explicitly supported.
+- Update zh-CN legal style docs or add zh-CN action style docs.
+- Add tests for forbidden overclaim verbs.
+
 ### P2 — Add Issue-First zh-CN Renderer
 
-Type: Feature  
-Milestone: 0.5.0  
-Area: Chinese Output  
+Type: Feature
+Milestone: 0.5.0
+Area: Chinese Output
 Priority: P2
 
 Tasks:
@@ -403,11 +719,26 @@ Tasks:
 - Preserve key English SEC/legal/accounting terms.
 - Add readability tests.
 
+### P2 — Add Issue Count And Excerpt-Ratio Readability Tests
+
+Type: Test
+Milestone: 0.5.0
+Area: Reports
+Priority: P2
+
+Tasks:
+
+- Assert `3 <= issue_count <= 6` for fixture reports.
+- Assert `main_report_source_excerpt_ratio < 25%`.
+- Assert Evidence Appendix contains long excerpts.
+- Assert no issue title equals a domain title.
+- Assert no main section is titled only `Questions to Ask`.
+
 ### P3 — Add RAG-Ready EvidenceStore
 
-Type: Feature  
-Milestone: 0.6.0  
-Area: Risk Engine  
+Type: Feature
+Milestone: 0.6.0
+Area: Risk Engine
 Priority: P3
 
 Tasks:
