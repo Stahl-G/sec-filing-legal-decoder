@@ -146,6 +146,9 @@ class RiskCardReport:
     review_mode: str = "source-only"
     external_enrichment: bool = False
     issuer_profile: str = "general"
+    issues: list[dict[str, Any]] = field(default_factory=list)
+    functional_action_plan: dict[str, Any] = field(default_factory=dict)
+    evidence_appendix: list[dict[str, Any]] = field(default_factory=list)
     disclaimer: str = DISCLAIMER
 
     def to_dict(self) -> dict[str, Any]:

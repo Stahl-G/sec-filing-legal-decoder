@@ -5,34 +5,39 @@ report filings.
 
 SEC Filing Legal Decoder is an AI agent skill and Python CLI that turns
 legal-heavy SEC filing language into finance-readable legal risk reviews,
-issue-level risk cards, escalation questions, management follow-up items, and
+evidence-backed risk cards, escalation questions, management follow-up items, and
 Obsidian-friendly Markdown.
 
 SEC Filing Legal Decoder 是一个 AI agent skill 和 Python CLI，用于把 SEC filing
-中法律语言较重的内容，转换成金融读者可读的法律风险复核、事项级风险卡、升级问题、
+中法律语言较重的内容，转换成金融读者可读的法律风险复核、有证据锚点的风险卡、升级问题、
 管理层跟进事项和 Obsidian-friendly Markdown。
 
 ## What This Project Is
 
-- A deterministic `v0.4.1` source-only review workflow with an agent-readable
+- A deterministic `v0.4.2` source-only review workflow with an agent-readable
   skill wrapper.
 - A legal-to-finance decoder for legal proceedings, internal controls,
   regulatory risk, related-party transactions, debt covenants, guarantees,
   commitments, dilution, tax, cybersecurity governance, disclosure consistency,
   and material contracts.
-- A risk-card generator that consolidates paragraphs into issue-level review
-  themes.
+- A risk-card generator that consolidates filing paragraphs into
+  domain-grouped, evidence-backed legal-to-finance notes.
+- A v0.4.2 compatibility contract for future issue-first outputs:
+  `issues`, `functional_action_plan`, and `evidence_appendix`.
 - A CLI that reads SEC `.htm/.html` Inline XBRL main documents, Markdown, and
   TXT files without MinerU.
 - An optional MinerU path for PDF, Office, image, or non-EDGAR fallback files.
 
 ## 这个项目是什么
 
-- 一个 deterministic `v0.4.1` source-only review workflow，并带有 agent-readable
+- 一个 deterministic `v0.4.2` source-only review workflow，并带有 agent-readable
   skill wrapper。
 - 一个 legal-to-finance decoder，覆盖法律诉讼、内控、监管、关联交易、债务
   covenant、担保、承诺事项、股权稀释、税务、网络安全治理、披露一致性和重大合同。
-- 一个 risk-card generator，把原文段落合并成事项级风险主题。
+- 一个 risk-card generator，把 filing 段落合并成按风险域分组、有证据锚点的
+  legal-to-finance notes。
+- 一个 v0.4.2 compatibility contract，为未来 issue-first 输出预留
+  `issues`、`functional_action_plan` 和 `evidence_appendix`。
 - 一个 CLI，可以直接读取 SEC `.htm/.html` Inline XBRL 主文件、Markdown 和 TXT，
   不依赖 MinerU。
 - 一个可选 MinerU 路径，用于 PDF、Office、图片或非 EDGAR fallback 文件。
@@ -44,7 +49,7 @@ SEC Filing Legal Decoder 是一个 AI agent skill 和 Python CLI，用于把 SEC
 - Not a generic financial statement reader.
 - Not a PDF parser and not a MinerU wrapper.
 - Not a disclosure conclusion engine.
-- Not an external enrichment tool. `v0.4.1` does not add web, news, analyst, or
+- Not an external enrichment tool. `v0.4.2` does not add web, news, analyst, or
   database context to the filing.
 
 ## 这个项目不是什么
@@ -53,7 +58,7 @@ SEC Filing Legal Decoder 是一个 AI agent skill 和 Python CLI，用于把 SEC
 - 不是通用财务报表阅读器。
 - 不是 PDF parser，也不是 MinerU 套壳。
 - 不是披露结论引擎。
-- 不是外部信息增强工具。`v0.4.1` 不会把网页、新闻、卖方报告或数据库信息混入 filing。
+- 不是外部信息增强工具。`v0.4.2` 不会把网页、新闻、卖方报告或数据库信息混入 filing。
 
 ## SEC Filing Source Priority
 
@@ -322,7 +327,7 @@ sec-filing-legal-decoder risk-cards filing.htm \
 
 ## Issuer Profiles
 
-`v0.4.1` includes issuer profiles for under-covered issuer review. Profiles adjust
+`v0.4.2` includes issuer profiles for under-covered issuer review. Profiles adjust
 priority only when the filing text supports that risk.
 
 Supported profiles:
@@ -336,7 +341,7 @@ Supported profiles:
 
 ## Issuer profile
 
-`v0.4.1` 包含 issuer profile，适合 under-covered issuer review。Profile 只在
+`v0.4.2` 包含 issuer profile，适合 under-covered issuer review。Profile 只在
 filing 原文支持相应风险时调整优先级。
 
 支持：
@@ -361,7 +366,9 @@ The JSON output includes:
 - `issuer_profile`
 - `coverage_summary`
 - `risk_cards`
-- `route_audit`
+- `issues` (v0.4.2 placeholder; populated by future issue-first workflows)
+- `functional_action_plan` (v0.4.2 placeholder)
+- `evidence_appendix` (v0.4.2 placeholder)
 
 ## 如何阅读输出
 
@@ -376,7 +383,9 @@ JSON 输出包含：
 - `issuer_profile`
 - `coverage_summary`
 - `risk_cards`
-- `route_audit`
+- `issues`（v0.4.2 占位字段；未来 issue-first workflow 会填充）
+- `functional_action_plan`（v0.4.2 占位字段）
+- `evidence_appendix`（v0.4.2 占位字段）
 
 ## Obsidian Export
 
@@ -452,6 +461,8 @@ information. Use synthetic examples and public filing excerpts only.
 ## More Docs
 
 - [Source-only review](docs/source-only-review.md)
+- [Output compatibility contract](docs/output-compatibility-contract.md)
+- [Terminology](docs/terminology.md)
 - [Development workflow](docs/development-workflow.md)
 - [Update workflow](docs/update-workflow.md)
 - [Privacy and sanitization](docs/privacy-and-sanitization.md)
@@ -461,6 +472,8 @@ information. Use synthetic examples and public filing excerpts only.
 ## 更多文档
 
 - [Source-only review](docs/source-only-review.md)
+- [Output compatibility contract](docs/output-compatibility-contract.md)
+- [Terminology](docs/terminology.md)
 - [Development workflow](docs/development-workflow.md)
 - [Update workflow](docs/update-workflow.md)
 - [Privacy and sanitization](docs/privacy-and-sanitization.md)

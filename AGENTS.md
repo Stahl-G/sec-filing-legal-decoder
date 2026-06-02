@@ -10,7 +10,7 @@
   synthetic names in README, tests, evals, docs, and examples.
 - Preserve the distinction between parser backends and filing workflow logic.
 - MinerU must remain optional; EDGAR HTML, Markdown, and TXT analysis should work without it.
-- v0.4.1 is deterministic, rule-based, and source-only. Future LLM or external
+- v0.4.2 is deterministic, rule-based, and source-only. Future LLM or external
   enrichment adapters should be isolated behind adapter boundaries.
 - Outputs must not claim to provide legal advice, investment advice, accounting
   advice, audit advice, or professional conclusions.
@@ -32,7 +32,7 @@
 ## Preferred Workflow
 
 - Use `sec-filing-legal-decoder risk-cards` as the primary command.
-- Use `--review-mode source-only`; v0.4.1 does not add web, news, analyst,
+- Use `--review-mode source-only`; v0.4.2 does not add web, news, analyst,
   market-data, or database enrichment.
 - Choose an issuer profile when useful:
   `general`, `small-issuer`, `foreign-private-issuer`, `spac-de-spac`,

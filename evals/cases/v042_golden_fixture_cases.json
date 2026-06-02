@@ -1,0 +1,136 @@
+[
+  {
+    "name": "small_fpi_liquidity_controls_and_related_party_support",
+    "path": "examples/synthetic_small_fpi_20f.htm",
+    "issuer_profile": "small-issuer",
+    "expected_risk_domains": [
+      "audit_going_concern",
+      "internal_control_reporting",
+      "related_party_governance",
+      "equity_dilution_control"
+    ],
+    "expected_issue_titles": [
+      "Liquidity plan credibility and going-concern support",
+      "Control remediation timing and reporting reliability",
+      "Affiliate support, related-party economics, and dilution stack"
+    ],
+    "expected_owners": ["Finance", "Auditor", "Legal", "Board", "IR"],
+    "expected_do_not_overstate": [
+      "Do not say the issuer will fail; evaluate substantial doubt against disclosed mitigation plans.",
+      "Do not equate control weakness with proven fraud or misstated financials.",
+      "Do not label related-party support improper without filing support."
+    ],
+    "expected_action_artifacts": [
+      "liquidity bridge memo",
+      "ICFR remediation tracker",
+      "related-party and dilution support schedule"
+    ]
+  },
+  {
+    "name": "spac_despace_equity_stack_and_controls",
+    "path": "examples/synthetic_spac_despace_20f.htm",
+    "issuer_profile": "spac-de-spac",
+    "expected_risk_domains": [
+      "audit_going_concern",
+      "internal_control_reporting",
+      "equity_dilution_control"
+    ],
+    "expected_issue_titles": [
+      "De-SPAC capital stack dilution and investor communication risk",
+      "Warrant and earnout accounting control remediation",
+      "Financing dependency behind going-concern language"
+    ],
+    "expected_owners": ["Finance", "Legal", "Auditor", "IR", "Board"],
+    "expected_do_not_overstate": [
+      "Do not treat all potential shares as currently issued.",
+      "Do not imply the accounting issue is remediated until controls are tested.",
+      "Do not present future financing as committed unless disclosed."
+    ],
+    "expected_action_artifacts": [
+      "fully diluted capitalization bridge",
+      "warrant and earnout accounting memo",
+      "financing runway support schedule"
+    ]
+  },
+  {
+    "name": "manufacturing_commitments_and_concentration",
+    "path": "examples/synthetic_manufacturing_10k.htm",
+    "issuer_profile": "manufacturing",
+    "expected_risk_domains": ["guarantees_commitments"],
+    "expected_issue_titles": [
+      "Factory ramp commitments, customer concentration, and supplier dependency"
+    ],
+    "expected_owners": ["Finance", "Legal", "Management", "Operations"],
+    "expected_do_not_overstate": [
+      "Do not equate commitments or backlog with guaranteed revenue.",
+      "Do not treat concentration language as proof of customer loss."
+    ],
+    "expected_action_artifacts": [
+      "commitments and concentration schedule",
+      "factory ramp contingency tracker"
+    ]
+  },
+  {
+    "name": "policy_reliance_trade_and_contracts",
+    "path": "examples/synthetic_policy_reliance_20f.htm",
+    "issuer_profile": "foreign-private-issuer",
+    "expected_risk_domains": [
+      "regulatory_trade_policy",
+      "material_contracts"
+    ],
+    "expected_issue_titles": [
+      "Tax credit, local content, and customs assumptions behind margin durability",
+      "Regulatory approval dependencies embedded in offtake and supply agreements"
+    ],
+    "expected_owners": ["Legal", "Finance", "IR", "Management"],
+    "expected_do_not_overstate": [
+      "Do not conclude non-compliance or guaranteed recovery.",
+      "Do not present eligibility or customs outcomes as resolved when the filing frames them as uncertain."
+    ],
+    "expected_action_artifacts": [
+      "regulatory exposure matrix",
+      "contract dependency and termination-rights schedule"
+    ]
+  },
+  {
+    "name": "tax_dta_valuation_allowance_and_transfer_pricing",
+    "path": "examples/synthetic_tax_dta_10k.htm",
+    "issuer_profile": "general",
+    "expected_risk_domains": ["tax_cross_border"],
+    "expected_issue_titles": [
+      "Deferred tax asset support and valuation allowance durability",
+      "Transfer-pricing and withholding tax reserve exposure"
+    ],
+    "expected_owners": ["Finance", "Legal", "Auditor"],
+    "expected_do_not_overstate": [
+      "Do not say the tax position is wrong or accepted unless the filing says so.",
+      "Do not treat deferred tax assets as cash benefits without valuation-allowance support."
+    ],
+    "expected_action_artifacts": [
+      "jurisdiction-by-jurisdiction taxable income support",
+      "uncertain tax position reserve memo"
+    ]
+  },
+  {
+    "name": "litigation_contingency_probability_range_and_recoveries",
+    "path": "examples/synthetic_litigation_contingency_10k.htm",
+    "issuer_profile": "general",
+    "expected_risk_domains": [
+      "legal_proceedings_litigation",
+      "guarantees_commitments"
+    ],
+    "expected_issue_titles": [
+      "Loss contingency disclosure where exposure is reasonably possible but not estimable",
+      "Insurance and indemnification recovery uncertainty"
+    ],
+    "expected_owners": ["Legal", "Finance", "Auditor", "IR"],
+    "expected_do_not_overstate": [
+      "Do not say the issuer violated law or will incur a loss.",
+      "Do not treat insurance or indemnification recovery as certain."
+    ],
+    "expected_action_artifacts": [
+      "matter tracker with probability and range support",
+      "insurance and indemnification recovery schedule"
+    ]
+  }
+]

@@ -1,4 +1,4 @@
-"""Generate issue-level legal risk cards from routed filing paragraphs."""
+"""Generate evidence-backed legal risk cards from routed filing paragraphs."""
 
 from __future__ import annotations
 
@@ -88,7 +88,7 @@ def generate_risk_card_report(
     """Generate a v0.4 source-only risk-card report from a parsed document."""
 
     if review_mode != "source-only":
-        raise ValueError("v0.4.1 only supports --review-mode source-only.")
+        raise ValueError("v0.4.2 only supports --review-mode source-only.")
     form_type, mode = detect_document_mode(document)
     paragraphs = split_paragraphs(document.content)
     routes = route_paragraphs(paragraphs, document.source_path, mode)

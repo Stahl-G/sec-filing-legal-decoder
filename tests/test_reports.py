@@ -51,3 +51,6 @@ def test_legal_risk_cards_report_contains_cards_and_scope():
     assert "evidence_quality" in payload
     assert "source_excerpts" in payload
     assert "risk_cards" in payload
+    assert '"issues": []' in payload
+    assert '"functional_action_plan": {}' in payload
+    assert '"evidence_appendix": []' in payload

@@ -14,6 +14,7 @@ if str(SRC) not in sys.path:
 from sec_filing_legal_decoder.classifiers import classify_section, triage_paragraph
 from sec_filing_legal_decoder.crosswalk.escalation_questions import generate_escalation_questions
 from sec_filing_legal_decoder.crosswalk.finance_relevance_map import guidance_for
+from sec_filing_legal_decoder.parser_backends import choose_backend
 from sec_filing_legal_decoder.reports import render_integrated_legal_risk_review
 from sec_filing_legal_decoder.reports.zh_cn_reports import render_integrated_legal_risk_review_zh_cn
 from sec_filing_legal_decoder.risk_cards import generate_risk_card_report
@@ -29,6 +30,7 @@ def main() -> int:
     failures.extend(_eval_v04_risk_cards())
     failures.extend(_eval_v04_issuer_profiles())
     failures.extend(_eval_v04_zh_cn_quality())
+    failures.extend(_eval_v042_golden_fixtures())
 
     passed = "PASS" if not failures else "FAIL"
     total = _case_count()
@@ -139,6 +141,27 @@ def _eval_v04_zh_cn_quality() -> list[str]:
     return failures
 
 
+def _eval_v042_golden_fixtures() -> list[str]:
+    failures: list[str] = []
+    for case in _load("v042_golden_fixture_cases.json"):
+        path = ROOT / str(case["path"])
+        document = choose_backend("auto", path).parse(path)
+        report = generate_risk_card_report(document, issuer_profile=str(case["issuer_profile"]))
+        actual_domains = {card.risk_domain for card in report.risk_cards}
+        for domain in case["expected_risk_domains"]:
+            if str(domain) not in actual_domains:
+                failures.append(f"v042_golden_fixtures/{case['name']}: missing domain {domain}")
+        for field in [
+            "expected_issue_titles",
+            "expected_owners",
+            "expected_do_not_overstate",
+            "expected_action_artifacts",
+        ]:
+            if not case.get(field):
+                failures.append(f"v042_golden_fixtures/{case['name']}: missing contract field {field}")
+    return failures
+
+
 def _case_count() -> int:
     return sum(len(_load(name)) for name in [
         "classifier_cases.json",
@@ -148,6 +171,7 @@ def _case_count() -> int:
         "v04_risk_card_cases.json",
         "v04_issuer_profile_cases.json",
         "v04_zh_cn_quality_cases.json",
+        "v042_golden_fixture_cases.json",
     ])
 
 

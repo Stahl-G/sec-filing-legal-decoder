@@ -2,6 +2,22 @@
 
 All notable changes to `sec-filing-legal-decoder` are documented here.
 
+## 0.4.2
+
+### Added
+- Golden synthetic fixture contracts for the pre-0.5 issue-first refactor.
+- Synthetic policy reliance, tax/DTA, and litigation contingency filing examples.
+- Product-quality scoring for future issue-first reports.
+- Output compatibility placeholders: `issues`, `functional_action_plan`, and `evidence_appendix`.
+- Terminology and output compatibility documentation.
+
+### Changed
+- Clarified risk domain vs risk card vs risk issue language.
+- Updated README, skill package, source-only docs, and report tags to v0.4.2.
+
+### Workflow
+- Completed the bridge release before switching default future work to pull requests.
+
 ## 0.4.1
 
 ### Added

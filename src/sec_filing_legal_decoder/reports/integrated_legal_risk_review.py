@@ -12,7 +12,7 @@ def render_integrated_legal_risk_review(
     lang: str = "en",
     term_style: str = "bilingual",
 ) -> str:
-    """Render the first-read narrative report for v0.4.1+ workflows."""
+    """Render the first-read narrative report for v0.4.2+ workflows."""
 
     if lang == "zh-CN":
         from .zh_cn_reports import render_integrated_legal_risk_review_zh_cn
@@ -50,7 +50,7 @@ def _frontmatter(report: RiskCardReport) -> list[str]:
         "  - sec-filing",
         "  - legal-risk",
         "  - integrated-review",
-        "  - sec-filing-legal-decoder/v0.4.1",
+        "  - sec-filing-legal-decoder/v0.4.2",
         f'form_type: "{_yaml_escape(report.document.form_type)}"',
         f'document_mode: "{_yaml_escape(report.document.mode)}"',
         f'source_path: "{_yaml_escape(report.document.source_path)}"',
@@ -78,7 +78,7 @@ def _executive_takeaway(
         f"The main read-first legal-risk themes are {theme_names}. "
         f"The report analyzed {report.coverage_summary.paragraphs_total} paragraph(s), routed out "
         f"{report.coverage_summary.financial_kpi_routed_out} ordinary finance KPI paragraph(s), and generated "
-        f"{len(report.risk_cards)} issue-level card(s). {len(appendix)} card(s) are appendix-level or lower-priority. "
+        f"{len(report.risk_cards)} evidence-backed risk card(s). {len(appendix)} card(s) are appendix-level or lower-priority. "
         f"{suppressed} weak, taxonomy-like, or non-issuer-specific source excerpt(s) were suppressed from the main narrative."
     )
 

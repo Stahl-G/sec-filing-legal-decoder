@@ -1,7 +1,7 @@
 ---
 name: sec-filing-legal-decoder
 description: This skill should be used when the user asks to "review a 10-K", "review a 20-F", "analyze SEC filing legal risks", "decode legal-heavy annual report language", "generate legal risk cards", "explain filing legal risks for finance readers", "review related-party transactions", "review going concern language", "check internal control weaknesses", "review legal proceedings", "analyze warrants or earnout dilution", "review debt covenants", "generate escalation questions", "create a Chinese legal-to-finance review", or perform source-only legal risk review of 10-K, 10-Q, 20-F, 40-F, 6-K, annual reports, and amendment documents.
-version: 0.4.1
+version: 0.4.2
 ---
 
 # SEC Filing Legal Decoder
@@ -10,7 +10,7 @@ version: 0.4.1
 
 Use this skill to run `sec-filing-legal-decoder`, a Python CLI and agent-readable
 workflow for source-only legal-to-finance review of SEC filings. The core output
-is an integrated `legal-risk-review.md` plus issue-level legal risk cards,
+is an integrated `legal-risk-review.md` plus evidence-backed legal risk cards,
 escalation questions, management follow-up, evidence audit, and JSON.
 
 Keep the Python CLI as the execution layer. Treat this skill as the agent
@@ -162,7 +162,7 @@ explicitly supports that statement.
 
 - `references/source-priority.md`: source selection and MinerU fallback.
 - `references/risk-taxonomy.md`: risk domains, signals, and typical owners.
-- `references/output-contract.md`: output files and reading contract.
+- `references/output-contract.md`: output files, reading contract, and v0.5 placeholders.
 - `references/source-only-review.md`: source-only boundaries.
 - `references/privacy-and-sanitization.md`: repository privacy rules.
 - `references/zh-cn-legal-style.md`: Chinese bilingual style rules.

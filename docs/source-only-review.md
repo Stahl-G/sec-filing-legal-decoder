@@ -1,6 +1,6 @@
 # Source-Only Review Mode
 
-`v0.4.1` treats the SEC filing itself as the evidence boundary.
+`v0.4.2` treats the SEC filing itself as the evidence boundary.
 
 The default and only supported review mode is:
 
@@ -14,7 +14,7 @@ text plus deterministic rules inside this repository.
 
 ## 中文说明
 
-`v0.4.1` 把 SEC filing 本身作为证据边界。
+`v0.4.2` 把 SEC filing 本身作为证据边界。
 
 默认且唯一支持的 review mode 是：
 

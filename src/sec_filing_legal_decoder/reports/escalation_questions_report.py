@@ -12,7 +12,7 @@ def render_escalation_questions_report(
     lang: str = "en",
     term_style: str = "bilingual",
 ) -> str:
-    """Render issue-level escalation questions."""
+    """Render risk-card escalation questions."""
 
     if lang == "zh-CN":
         from .zh_cn_reports import render_escalation_questions_report_zh_cn

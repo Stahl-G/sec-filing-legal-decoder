@@ -93,7 +93,7 @@ def _dashboard(
         f"# {context['company']} Legal Risk Dashboard".strip(),
         "",
         "> [!summary] v0.4 Source-Only Legal Risk Cards",
-        "> This dashboard links issue-level legal, regulatory, governance, audit, disclosure, debt, related-party, dilution, and material-contract risk cards.",
+        "> This dashboard links evidence-backed legal, regulatory, governance, audit, disclosure, debt, related-party, dilution, and material-contract risk cards.",
         "",
         "## Key Outputs",
         "",

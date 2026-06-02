@@ -37,3 +37,6 @@ def test_source_only_metadata_in_markdown_and_json(tmp_path: Path):
     assert payload["review_mode"] == "source-only"
     assert payload["external_enrichment"] is False
     assert payload["issuer_profile"] == "small-issuer"
+    assert payload["issues"] == []
+    assert payload["functional_action_plan"] == {}
+    assert payload["evidence_appendix"] == []

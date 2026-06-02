@@ -2,7 +2,7 @@
   "name": "sec-filing-legal-decoder",
   "title": "SEC Filing Legal Decoder",
   "description": "Agent-readable skill and CLI wrapper for source-only legal-to-finance review of SEC filings, generating finance-readable legal risk cards, escalation questions, management follow-up notes, and Chinese bilingual review outputs.",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "entrypoint": "sec-filing-legal-decoder",
   "primary_command": "sec-filing-legal-decoder risk-cards",
   "default_review_mode": "source-only",

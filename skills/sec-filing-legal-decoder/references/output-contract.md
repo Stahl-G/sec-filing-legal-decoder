@@ -12,7 +12,7 @@ Primary readers: finance, management, IR, legal coordinator, agent.
 
 ## `legal-risk-cards.md`
 
-Issue-level card appendix. Use it to inspect each risk domain, source excerpts,
+Risk-card appendix. Use it to inspect each risk domain, source excerpts,
 owners, questions, and evidence details.
 
 Primary readers: legal, finance, audit, IR, management.
@@ -44,3 +44,20 @@ Machine-readable card output. Use it for downstream workflows, tests, evals, or
 structured review pipelines.
 
 Primary readers: software agents and scripts.
+
+From v0.4.2 onward, the JSON includes compatibility placeholders for the future
+issue-first workflow:
+
+```json
+{
+  "risk_cards": [],
+  "issues": [],
+  "functional_action_plan": {},
+  "evidence_appendix": []
+}
+```
+
+In v0.4.2, `risk_cards` is populated and the other three fields remain empty
+placeholders. Do not assume `issues`, `functional_action_plan`, or
+`evidence_appendix` are populated until a future issue-first version adds that
+behavior.

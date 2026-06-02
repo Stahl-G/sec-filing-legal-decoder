@@ -61,7 +61,7 @@ MATERIAL_TERMS = (
 
 
 def priority_for(domain: str, text: str, paragraph_count: int) -> str:
-    """Return issue-level priority for a risk card."""
+    """Return reader-review priority for a risk card."""
 
     priority = DOMAIN_BASE_PRIORITY.get(domain, "Medium")
     lowered = text.lower()

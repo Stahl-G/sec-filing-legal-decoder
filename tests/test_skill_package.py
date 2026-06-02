@@ -17,7 +17,7 @@ def test_skill_frontmatter_and_manifest_versions_match():
     manifest = json.loads(SKILL_DIR.joinpath("skill.json").read_text(encoding="utf-8"))
 
     assert frontmatter["name"] == "sec-filing-legal-decoder"
-    assert frontmatter["version"] == "0.4.1"
+    assert frontmatter["version"] == "0.4.2"
     assert manifest["version"] == frontmatter["version"]
     assert "This skill should be used when" in frontmatter["description"]
     for trigger in ["10-K", "20-F", "legal risk cards", "SEC filing", "Chinese", "source-only"]:

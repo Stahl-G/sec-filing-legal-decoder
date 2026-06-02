@@ -142,7 +142,7 @@ Delivered:
 
 ### 0.4.2 — Pre-0.5 Quality Baseline
 
-Status: Ready
+Status: Done
 
 Goal: add quality baselines before the issue-first refactor. This is a bridge
 release and should not change core product behavior.
@@ -156,7 +156,7 @@ Purpose:
 - Clarify terminology before introducing `RiskIssue`.
 - Switch the repository workflow to pull requests by default after `0.4.2`.
 
-Planned fixtures:
+Delivered fixtures:
 
 ```text
 synthetic_small_fpi_20f.htm
@@ -167,7 +167,7 @@ synthetic_tax_dta_10k.htm
 synthetic_litigation_contingency_10k.htm
 ```
 
-Each fixture should define:
+Each fixture defines:
 
 - Expected risk domains.
 - Expected issue titles.
@@ -175,7 +175,7 @@ Each fixture should define:
 - Expected do-not-overstate cautions.
 - Expected action artifacts.
 
-Product-quality checks:
+Delivered product-quality checks:
 
 - `main_report_has_executive_thesis`
 - `issue_count_between_3_and_6`
@@ -187,7 +187,7 @@ Product-quality checks:
 - `main_report_excerpt_ratio_under_25_percent`
 - `functional_action_plan_has_output_artifacts`
 
-Compatibility contract:
+Delivered compatibility contract:
 
 ```json
 {
@@ -198,7 +198,7 @@ Compatibility contract:
 }
 ```
 
-Terminology:
+Delivered terminology:
 
 - Risk domain: backend classification label.
 - Risk card: evidence-backed legal-to-finance note grouped by domain.
