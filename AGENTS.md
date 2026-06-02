@@ -17,6 +17,18 @@
 - When modifying scripts or behavior, run tests or at least a smoke test before
   completion.
 
+## Git Workflow
+
+- Through the `0.4.2` bridge release, maintainers may make direct `main` updates
+  only for roadmap, project-board, release, or emergency maintenance work.
+- After `0.4.2`, default to a pull-request workflow:
+  create a `codex/...` feature branch, commit there, push the branch, and open a
+  PR against `main`.
+- Do not push directly to `main` after `0.4.2` unless the user explicitly asks
+  for a hotfix/direct push.
+- PR titles, descriptions, branch names, and commit messages must follow the
+  same privacy rules as source files.
+
 ## Preferred Workflow
 
 - Use `sec-filing-legal-decoder risk-cards` as the primary command.

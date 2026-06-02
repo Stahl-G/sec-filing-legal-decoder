@@ -12,9 +12,25 @@ pytest
 python evals/run_evals.py
 ```
 
-Keep v0.1 deterministic and rule-based. New model, EDGAR, MinerU API, DOCX, or
-diff features should be added behind adapters so Markdown/TXT analysis continues
-to work without external credentials.
+Keep the project deterministic, rule-based, and source-only unless a release
+explicitly introduces a new adapter boundary.
+
+## Pull Requests
+
+After the `0.4.2` bridge release, use pull requests by default:
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c codex/short-change-name
+pytest
+python evals/run_evals.py
+git push -u origin codex/short-change-name
+gh pr create --base main --head codex/short-change-name
+```
+
+Direct pushes to `main` after `0.4.2` should be limited to explicit hotfix or
+maintenance requests.
 
 ## Safety
 
@@ -22,3 +38,6 @@ to work without external credentials.
 - Use synthetic examples or clearly public filing excerpts only.
 - Do not add legal, investment, accounting, or audit conclusions.
 - Add tests when changing classification, triage, reports, or parser behavior.
+- Keep PR titles, descriptions, branch names, commits, screenshots, and sample
+  outputs free of private filing names, internal company names, credentials, raw
+  logs, or material non-public information.

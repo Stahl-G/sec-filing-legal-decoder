@@ -49,6 +49,20 @@ Acceptable synthetic examples:
 - `Sample Renewable Manufacturer`
 - `Example Annual Report Issuer`
 
+## Repository Workflow Boundary
+
+Through the `0.4.2` bridge release, direct `main` updates are allowed only for
+roadmap, project-board, release, or emergency maintenance work.
+
+After `0.4.2`, default to pull requests:
+
+```text
+feature branch -> tests / evals -> PR -> review / checks -> merge to main
+```
+
+Do not push directly to `main` after `0.4.2` unless the user explicitly requests
+a hotfix/direct push.
+
 ## Product Positioning
 
 Primary positioning:
@@ -140,6 +154,7 @@ Purpose:
 - Lock compatibility expectations for existing risk-card outputs and new issue
   outputs.
 - Clarify terminology before introducing `RiskIssue`.
+- Switch the repository workflow to pull requests by default after `0.4.2`.
 
 Planned fixtures:
 
@@ -446,6 +461,7 @@ Out of scope before issue-first reports are stable:
 | Add product-quality scoring before v0.5 | 0.4.2 | Eval | Evals | P0 | Ready |
 | Add backward compatibility contract for issue outputs | 0.4.2 | Docs | Reports | P0 | Ready |
 | Clarify terminology: domain vs card vs issue | 0.4.2 | Docs | Docs | P2 | Ready |
+| Adopt PR-based workflow after v0.4.2 | 0.4.2 | Docs | Release | P0 | Ready |
 | Add issue synthesis schema | 0.5.0 | Feature | Issues | P1 | Ready after 0.4.2 |
 | Add issue-first `legal-risk-review.md` | 0.5.0 | Refactor | Reports | P1 | Ready after 0.4.2 |
 | Add functional action planner | 0.5.0 | Feature | Issues | P2 | Ready after 0.4.2 |
@@ -524,6 +540,23 @@ Tasks:
 - Define risk card.
 - Define risk issue.
 - Update roadmap and docs before issue-first implementation.
+
+### P0 — Adopt PR-Based Workflow After v0.4.2
+
+Type: Docs
+Milestone: 0.4.2
+Area: Release
+Priority: P0
+
+Tasks:
+
+- Document feature-branch workflow.
+- Document `gh pr create` as the default post-0.4.2 delivery path.
+- Update `AGENTS.md`, `CONTRIBUTING.md`, and release process docs.
+- Allow direct `main` pushes only for explicit hotfix/direct-push requests after
+  `0.4.2`.
+- Keep PR metadata under the same privacy and sanitization rules as source
+  files.
 
 ## 0.5.0 Issue Breakdown
 
